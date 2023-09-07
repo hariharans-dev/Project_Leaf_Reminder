@@ -21,8 +21,16 @@ function decode_byte64(base64Credentials) {
 }
 
 var validateRequestBody = [
+  (req, res, next) => {
+    const numberOfFields = Object.keys(req.body).length;
+    if (numberOfFields == 0) {
+      return res.status(400).json({ message: "no feild given" });
+    }
+    next();
+  },
   check("user").exists().isString(),
   check("password").exists().isString(),
+  check("name").exists().isString(),
 ];
 
 app.post("/api/users", validateRequestBody, (req, res) => {
@@ -41,6 +49,7 @@ app.post("/api/users", validateRequestBody, (req, res) => {
       try {
         const new_user = {
           user: newuser.user,
+          name: newuser.name,
           key: byte64,
         };
         user_object.createuser(new_user);
@@ -57,6 +66,13 @@ app.post("/api/users", validateRequestBody, (req, res) => {
 });
 
 validateRequestBody = [
+  (req, res, next) => {
+    const numberOfFields = Object.keys(req.body).length;
+    if (numberOfFields == 0) {
+      return res.status(400).json({ message: "no feild given" });
+    }
+    next();
+  },
   check("user").exists().isString(),
   check("password").exists().isString(),
 ];
@@ -79,12 +95,30 @@ app.get("/api/users", validateRequestBody, (req, res) => {
   });
 });
 
+var allowedFields = ["name", "user", "password"];
+
 validateRequestBody = [
-  check("user").exists().isString(),
-  check("password").exists().isString(),
+  (req, res, next) => {
+    const numberOfFields = Object.keys(req.body).length;
+    if (numberOfFields == 0) {
+      return res.status(400).json({ message: "no feild given" });
+    }
+    for (const key in req.body) {
+      if (!allowedFields.includes(key)) {
+        return res
+          .status(400)
+          .json({ error: `Field '${key}' is not allowed.` });
+      }
+    }
+    next();
+  },
 ];
 
 app.put("/api/users", validateRequestBody, (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ message: "not in proper format" });
+  }
   const authHeader = req.headers["authorization"];
   if (!authHeader) {
     console.log("no authorisation");
@@ -111,7 +145,8 @@ app.put("/api/users", validateRequestBody, (req, res) => {
       filter = { user: body.user };
       user_object.finduser(filter).then((result) => {
         if (result == null) {
-          const data = { user: body.user, key: byte64 };
+          var data = body;
+          data.key = byte64;
           try {
             filter = { key: apiKey };
             user_object.updateuser(filter, data);
@@ -129,7 +164,13 @@ app.put("/api/users", validateRequestBody, (req, res) => {
   });
 });
 
+validateRequestBody = [];
+
 app.delete("/api/users", (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ message: "not in proper format" });
+  }
   const authHeader = req.headers["authorization"];
   if (!authHeader) {
     console.log("no authorisation");
