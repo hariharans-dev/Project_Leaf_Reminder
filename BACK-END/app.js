@@ -26,11 +26,8 @@ app.get("/forgetpassword", async (req, res) => {
 
     return res.json(responseData);
   } catch (error) {
-    console.error("Error:", error.response.data.message);
-    return res.json({
-      message: error.response.data.message,
-      status: error.response.status,
-    });
+    console.error("Error:");
+    return res.send("error");
   }
 });
 
@@ -43,20 +40,34 @@ app.get("/signin", async (req, res) => {
 
     const apiUrl = "http://localhost:5000/api/users";
 
-    const response = await axios({
-      method: "get",
-      url: apiUrl,
-      data: requestData,
-    });
-
-    const responseData = response.data;
-
-    return res.json(responseData);
+    try {
+      const response = await axios({
+        method: "get",
+        url: apiUrl,
+        data: requestData,
+      });
+      const responseData = response.data.key;
+      return res.json({
+        status: response.status,
+        key: responseData,
+      });
+    } catch (error) {
+      if (error.response.data) {
+        return res.json({
+          status: error.response.status,
+          data: error.response.data.message,
+        });
+      } else {
+        return res.json({
+          message: error.message,
+        });
+      }
+    }
   } catch (error) {
-    console.error("Error:", error.response.data.message);
-    return res.json({
-      message: error.response.data.message,
-      status: error.response.status,
+    console.log("api down");
+    return res.status(404).json({
+      message: error.message,
+      detials: "api not found"
     });
   }
 });
