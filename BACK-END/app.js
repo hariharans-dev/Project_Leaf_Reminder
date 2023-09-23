@@ -31,46 +31,38 @@ app.get("/forgetpassword", async (req, res) => {
   }
 });
 
-app.get("/signin", async (req, res) => {
+app.get("/signin", async (req, res) => {});
+
+const request_data = async (url, body, method, res) => {
   try {
-    const requestData = {
-      user: req.body.user,
-      password: req.body.password,
-    };
-
-    const apiUrl = "http://localhost:5000/api/users";
-
-    try {
-      const response = await axios({
-        method: "get",
-        url: apiUrl,
-        data: requestData,
-      });
-      const responseData = response.data.key;
-      return res.json({
-        status: response.status,
-        key: responseData,
-      });
-    } catch (error) {
-      if (error.response.data) {
-        return res.json({
-          status: error.response.status,
-          data: error.response.data.message,
-        });
-      } else {
-        return res.json({
-          message: error.message,
-        });
-      }
-    }
-  } catch (error) {
-    console.log("api down");
-    return res.status(404).json({
-      message: error.message,
-      detials: "api not found"
+    const response = await axios({
+      method: method,
+      url: url,
+      data: body,
     });
+    
+    const responseData = response.data.key;
+    
+    return res.status(response.status).json({
+      status: response.status,
+      key: responseData,
+    });
+  } catch (error) {
+    if (error.response) {
+      // Axios error with a response from the server
+      return res.status(error.response.status).json({
+        status: error.response.status,
+        data: error.response.data.message,
+      });
+    } else {
+      // Axios error with no response from the server
+      return res.status(500).json({
+        message: error.message,
+      });
+    }
   }
-});
+};
+
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

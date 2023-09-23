@@ -1,10 +1,12 @@
 const router = require("express").Router();
-const { check } = require("express-validator");
+const { check, validationResult } = require("express-validator");
 const {
   user_post,
   user_get,
   user_put,
   user_delete,
+  user_sendverification,
+  user_getverification,
 } = require("../controller/user/api_user_controller.js");
 
 const {
@@ -19,6 +21,34 @@ const {
   inventory_find,
 } = require("../controller/inventory/api_inventory_controller.js");
 
+const verifyToken = (req, res, next) => {
+  const authHeader = req.headers["authorization"];
+  if (!authHeader) {
+    console.log("no authorisation");
+    return res
+      .status(400)
+      .json({ message: "authorization header is missing." });
+  }
+  const [authType, apiKey] = authHeader.split(" ");
+  if (authType !== "Bearer") {
+    console.log("invalid authorization header");
+    return res
+      .status(400)
+      .json({ message: "invalid Authorization header format." });
+  }
+  if (
+    apiKey !== process.env.LOGIN_APIKEY &&
+    apiKey !== process.env.ADMIN_APIKEY
+  ) {
+    return res.status(401).json({ message: "invalid Authorization" });
+  }
+  next();
+};
+
+
+// users
+
+
 const validateRequestBody_post = [
   (req, res, next) => {
     const numberOfFields = Object.keys(req.body).length;
@@ -30,9 +60,16 @@ const validateRequestBody_post = [
   check("user").exists().isString(),
   check("password").exists().isString(),
   check("name").exists().isString(),
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ message: "not in proper format" });
+    }
+    next();
+  },
 ];
-
-router.post("/users", validateRequestBody_post, user_post);
+const postmiddleware = [validateRequestBody_post, verifyToken];
+router.post("/users", postmiddleware, user_post);
 
 const validateRequestBody_get = [
   (req, res, next) => {
@@ -44,20 +81,26 @@ const validateRequestBody_get = [
   },
   check("user").exists().isString(),
   check("password").exists().isString(),
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ message: "not in proper format" });
+    }
+    next();
+  },
 ];
-
-router.get("/users", validateRequestBody_get, user_get);
-
-var allowedFields = ["name", "user", "password"];
+const getmiddleware = [validateRequestBody_get, verifyToken];
+router.get("/users", getmiddleware, user_get);
 
 const validateRequestBody_put = [
   (req, res, next) => {
     const numberOfFields = Object.keys(req.body).length;
+    const putallowedFields = ["name", "user", "password", "key"];
     if (numberOfFields == 0) {
       return res.status(400).json({ message: "no feild given" });
     }
     for (const key in req.body) {
-      if (!allowedFields.includes(key)) {
+      if (!putallowedFields.includes(key)) {
         return res
           .status(400)
           .json({ error: `Field '${key}' is not allowed.` });
@@ -65,13 +108,85 @@ const validateRequestBody_put = [
     }
     next();
   },
+  check("key").exists().isString(),
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ message: "not in proper format" });
+    }
+    next();
+  },
 ];
+const putmiddleware = [validateRequestBody_put, verifyToken];
+router.put("/users", putmiddleware, user_put);
 
-router.put("/users", validateRequestBody_put, user_put);
+const validateRequestBody_delete = [
+  (req, res, next) => {
+    const numberOfFields = Object.keys(req.body).length;
+    if (numberOfFields == 0) {
+      return res.status(400).json({ message: "no feild given" });
+    }
+    next();
+  },
+  check("key").exists().isString(),
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ message: "not in proper format" });
+    }
+    next();
+  },
+];
+const deletemiddleware = [validateRequestBody_delete, verifyToken];
+router.delete("/users", deletemiddleware, user_delete);
 
-const validateRequestBody_delete = [];
+const validateRequestBody_sendverify = [
+  (req, res, next) => {
+    const numberOfFields = Object.keys(req.body).length;
+    if (numberOfFields == 0) {
+      return res.status(400).json({ message: "no feild given" });
+    }
+    next();
+  },
+  check("key").exists().isString(),
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ message: "not in proper format" });
+    }
+    next();
+  },
+];
+const sendverifymiddleware = [validateRequestBody_sendverify, verifyToken];
+router.get(
+  "/users/sendverification",
+  sendverifymiddleware,
+  user_sendverification
+);
 
-router.delete("/users", validateRequestBody_delete, user_delete);
+const validateRequestBody_getverify = [
+  (req, res, next) => {
+    const numberOfFields = Object.keys(req.body).length;
+    if (numberOfFields == 0) {
+      return res.status(400).json({ message: "no feild given" });
+    }
+    next();
+  },
+  check("verification_key").exists().isString(),
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ message: "not in proper format" });
+    }
+    next();
+  },
+];
+const getverifymiddleware = [validateRequestBody_getverify, verifyToken];
+router.get("/users/getverification", getverifymiddleware, user_getverification);
+
+
+//devicedata route
+
 
 const validateRequestBody_devicedata_post = [
   (req, res, next) => {
@@ -90,6 +205,8 @@ router.post(
   validateRequestBody_devicedata_post,
   devicedata_post
 );
+
+//inventory route
 
 const validateRequestBody_inventory_post = [
   (req, res, next) => {

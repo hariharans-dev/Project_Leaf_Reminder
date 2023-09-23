@@ -24,14 +24,12 @@ const devicedata_post = (req, res) => {
   }
   const authHeader = req.headers["authorization"];
   if (!authHeader) {
-    console.log("no authorisation");
     return res
       .status(401)
       .json({ message: "authorization header is missing." });
   }
   const [authType, apiKey] = authHeader.split(" ");
   if (authType !== "Bearer") {
-    console.log("invalid authorization header");
     return res
       .status(400)
       .json({ message: "invalid Authorization header format." });
@@ -46,8 +44,7 @@ const devicedata_post = (req, res) => {
       deviceid: deviceid,
       data: [
         {
-          date: currentDateTime.toDateString(),
-          time: currentDateTime.toTimeString(),
+          time: currentDateTime,
           soilmoisture: body.soilmoisture,
           temperature: body.temperature,
         },
@@ -58,6 +55,7 @@ const devicedata_post = (req, res) => {
         if (result == null) {
           try {
             device_object.createdata_devicedata(data);
+            console.log("created device for the first time");
             return res
               .status(200)
               .json({ message: "created deviceid and data added" });
@@ -66,13 +64,16 @@ const devicedata_post = (req, res) => {
           }
         } else {
           data = {
-            date: currentDateTime.toDateString(),
-            time: currentDateTime.toTimeString(),
+            time: currentDateTime,
             soilmoisture: body.soilmoisture,
             temperature: body.temperature,
           };
           try {
-            device_object.data_additon(filter, data);
+            const update = {
+              $push: { data: data },
+            };
+            device_object.data_additon(filter, update);
+            console.log("inserted data from already created deviceid");
             return res.status(200).json({ message: "data added" });
           } catch (error) {
             return res.status(500).json({ message: "server error" });

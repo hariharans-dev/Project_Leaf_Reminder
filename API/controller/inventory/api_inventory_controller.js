@@ -25,10 +25,12 @@ const inventory_post = (req, res) => {
   if (apiKey !== process.env.INVENTORY_APIKEY && apiKey !== ADMIN_APIKEY) {
     return res.status(401).json({ message: "invalid Authorization" });
   } else {
+    const currentDateTime = new Date();
     const body = req.body;
     const data = {
       device: body.device,
       deviceid: body.deviceid,
+      created_time: currentDateTime,
     };
     const filter = { deviceid: body.deviceid };
     try {
@@ -36,7 +38,8 @@ const inventory_post = (req, res) => {
         if (result == null) {
           try {
             inventory_object.create_device(data);
-            return res.status(200).json({ message: "device added" });
+            console.log("device created");
+            return res.status(200).json({ message: "device created" });
           } catch (error) {
             return res.status(500).json({ message: "server error" });
           }
@@ -57,14 +60,12 @@ const inventory_find = (req, res) => {
   }
   const authHeader = req.headers["authorization"];
   if (!authHeader) {
-    console.log("no authorisation");
     return res
       .status(401)
       .json({ message: "authorization header is missing." });
   }
   const [authType, apiKey] = authHeader.split(" ");
   if (authType !== "Bearer") {
-    console.log("invalid authorization header");
     return res
       .status(400)
       .json({ message: "invalid Authorization header format." });
@@ -76,6 +77,7 @@ const inventory_find = (req, res) => {
     const filter = { device: body.device };
     try {
       inventory_object.find_device(filter).then((result) => {
+        console.log("document search");
         return res.status(200).json(result);
       });
     } catch (error) {
@@ -114,6 +116,7 @@ const inventory_list = (req, res) => {
         for (var i = 0; i < result.length; i++) {
           data[i] = { deviceid: result[i].deviceid };
         }
+        console.log("documents search");
         return res.status(200).json(data);
       });
     } catch (error) {
@@ -145,8 +148,14 @@ const inventory_update = (req, res) => {
     return res.status(401).json({ message: "invalid Authorization" });
   } else {
     const body = req.body;
+    const currentDateTime = new Date();
     var filter = { deviceid: body.olddeviceid };
-    var data = { deviceid: body.newdeviceid, device: body.device };
+    var data = {
+      deviceid: body.newdeviceid,
+      device: body.device,
+      updated_time: currentDateTime,
+    };
+    var update = { $set: data };
     try {
       inventory_object.find_device(filter).then((result) => {
         if (result == null) {
@@ -155,7 +164,8 @@ const inventory_update = (req, res) => {
           if (body.olddeviceid == body.newdeviceid) {
             try {
               filter = { deviceid: body.olddeviceid };
-              inventory_object.update_device(filter, data);
+              inventory_object.update_device(filter, update);
+              console.log("device updated");
               return res.status(200).json({ message: "device updated" });
             } catch (error) {
               return res.status(500).json({ message: "server error" });
@@ -167,7 +177,8 @@ const inventory_update = (req, res) => {
                 if (result == null) {
                   try {
                     filter = { deviceid: body.olddeviceid };
-                    inventory_object.update_device(filter, data);
+                    inventory_object.update_device(filter, update);
+                    console.log("device updated");
                     return res.status(200).json({ message: "device updated" });
                   } catch (error) {
                     return res.status(500).json({ message: "server error" });
@@ -222,38 +233,16 @@ const inventory_delete = (req, res) => {
           console.log("device deleted");
           try {
             inventory_object.delete_device(filter);
+            console.log("device deleted");
+            return res.status(200).json({ message: "device deleted" });
           } catch (error) {
             return res.status(500).json({ message: "server error" });
           }
-          return res.status(200).json({ message: "device deleted" });
         }
       });
     } catch (error) {
       return res.status(500).json({ message: "server error" });
     }
-  }
-};
-
-const device_assignment = () => {
-  const filter = { device: "leaf-reminder" };
-  try {
-    inventory_object.find_device(filter).then((result) => {
-      if (result != null) {
-        const deviceid = result.deviceid;
-        filter = { deviceid: deviceid };
-        try {
-          var data = { device: "leaf-reminder-assigned" };
-          inventory_object.update_device(filter, data);
-          return deviceid;
-        } catch (error) {
-          return error;
-        }
-      } else {
-        return null;
-      }
-    });
-  } catch (error) {
-    return error;
   }
 };
 
@@ -263,5 +252,4 @@ module.exports = {
   inventory_list,
   inventory_update,
   inventory_find,
-  device_assignment,
 };

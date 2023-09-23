@@ -8,31 +8,21 @@ class Device_data {
       const collections = client
         .db(process.env.DB_USER)
         .collection(process.env.COLLECTION_DEVICEDATA);
-      const currentDateTime = new Date();
-      data.created_time = currentDateTime.toTimeString();
-      data.created_date = currentDateTime.toDateString();
       const result = collections.insertOne(data);
-      console.log(`Inserted document`);
       return result;
     } catch (error) {
-      console.error("Error inserting document:", error);
       return error;
     }
   }
 
-  data_additon(filter, data) {
+  data_additon(filter, update) {
     try {
       const collections = client
         .db(process.env.DB_USER)
         .collection(process.env.COLLECTION_DEVICEDATA);
-      const update = {
-        $push: { data: data },
-      };
       const result = collections.updateOne(filter, update);
-      console.log(`Inserted document`);
       return result;
     } catch (error) {
-      console.error("Error inserting document:", error);
       return error;
     }
   }
@@ -45,7 +35,6 @@ class Device_data {
       const result = collections.findOne(filter);
       return result;
     } catch (error) {
-      console.error("Error inserting document:", error);
       return error;
     }
   }
@@ -57,7 +46,6 @@ class Device_data {
       const results = collections.find(filter).limit(count).toArray();
       return results;
     } catch (error) {
-      console.error("Error inserting document:", error);
       return error;
     }
   }

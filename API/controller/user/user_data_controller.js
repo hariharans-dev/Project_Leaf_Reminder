@@ -8,46 +8,33 @@ class Login {
         .db(process.env.DB_USER)
         .collection(process.env.COLLECTION_USER);
       const currentDateTime = new Date();
-      data.created_time = currentDateTime.toTimeString();
-      data.created_date = currentDateTime.toDateString();
       const resutl = collections.insertOne(data);
-      console.log(`Inserted document`);
       return resutl;
     } catch (error) {
-      console.error("Error inserting document:");
       return error;
     }
   }
 
-  finduser(data) {
+  finduser(filter) {
     try {
       const collections = client
         .db(process.env.DB_USER)
         .collection(process.env.COLLECTION_USER);
-      const result = collections.findOne(data);
+      const result = collections.findOne(filter);
       return result;
     } catch (error) {
-      console.error("Error inserting document:", error);
       return error;
     }
   }
 
-  updateuser(filter, data) {
+  updateuser(filter, update) {
     const collections = client
       .db(process.env.DB_USER)
       .collection(process.env.COLLECTION_USER);
-    const currentDateTime = new Date();
-    data.updated_time = currentDateTime.toTimeString();
-    data.update_date = currentDateTime.toDateString();
-    const update = {
-      $set: data,
-    };
     try {
-      const result = collections.updateMany(filter, update);
+      const result = collections.updateOne(filter, update);
       return result;
-      console.log(`document(s) updated`);
     } catch (error) {
-      console.error("Error updating document:", error);
       return error;
     }
   }
@@ -61,7 +48,6 @@ class Login {
       console.log(`user deleted`);
       return result;
     } catch (error) {
-      console.error("Error deleting user:", error);
       return error;
     }
   }
