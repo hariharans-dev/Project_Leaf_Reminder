@@ -7,6 +7,8 @@ const {
   user_delete,
   user_sendverification,
   user_getverification,
+  user_sendotp,
+  user_verifyotp,
 } = require("../controller/user/api_user_controller.js");
 
 const {
@@ -45,9 +47,7 @@ const verifyToken = (req, res, next) => {
   next();
 };
 
-
 // users
-
 
 const validateRequestBody_post = [
   (req, res, next) => {
@@ -183,6 +183,47 @@ const validateRequestBody_getverify = [
 ];
 const getverifymiddleware = [validateRequestBody_getverify, verifyToken];
 router.get("/users/getverification", getverifymiddleware, user_getverification);
+
+const validateRequestBody_sendotp = [
+  (req, res, next) => {
+    const numberOfFields = Object.keys(req.body).length;
+    if (numberOfFields == 0) {
+      return res.status(400).json({ message: "no feild given" });
+    }
+    next();
+  },
+  check("key").exists().isString(),
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ message: "not in proper format" });
+    }
+    next();
+  },
+];
+const sendotpmiddleware = [validateRequestBody_sendotp, verifyToken];
+router.get("/users/sendotp", sendotpmiddleware, user_sendotp);
+
+const validateRequestBody_verifyotp = [
+  (req, res, next) => {
+    const numberOfFields = Object.keys(req.body).length;
+    if (numberOfFields == 0) {
+      return res.status(400).json({ message: "no feild given" });
+    }
+    next();
+  },
+  check("otp").exists().isString(),
+  check("key").exists().isString(),
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ message: "not in proper format" });
+    }
+    next();
+  },
+];
+const verifyotpmiddleware = [validateRequestBody_verifyotp, verifyToken];
+router.get("/users/verifyotp", verifyotpmiddleware, user_verifyotp);
 
 
 //devicedata route

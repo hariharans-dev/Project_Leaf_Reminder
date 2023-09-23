@@ -1,4 +1,3 @@
-const { validationResult } = require("express-validator");
 const {
   device_assignment,
 } = require("../inter_functions/device_allocation.js");
@@ -10,6 +9,11 @@ const user_object = new Login();
 function generateRandomKey() {
   const length = 15;
   return crypto.randomBytes(length).toString("hex");
+}
+
+function generateOTP() {
+  const otp = Math.floor(100000 + Math.random() * 900000);
+  return otp.toString();
 }
 
 function encode_byte64(user, password) {
@@ -219,10 +223,12 @@ const user_getverification = (req, res) => {
       } else {
         const verify_send_time = result.verify_send_time;
         const currentDateTime = new Date();
-        const timedifference = verify_send_time - currentDateTime;
-        const minutes = timedifference / (1000 * 60);
-        const expireminutes = 60;
-        if (minutes < expireminutes) {
+        const timedifference = currentDateTime - verify_send_time;
+        const seconds = timedifference / 1000;
+        console.log(seconds);
+        const expireminutes = 1;
+        const expireseconds = expireminutes * 60;
+        if (seconds < expireseconds) {
           const update = {
             $unset: {
               verification_key: 1,
@@ -250,6 +256,88 @@ const user_getverification = (req, res) => {
   }
 };
 
+const user_sendotp = (req, res) => {
+  const filter = { key: req.body.key };
+  try {
+    const currentDateTime = new Date();
+    user_object.finduser(filter).then((result) => {
+      if (result == null) {
+        return res.status(404).json({ message: "user not found" });
+      } else {
+        const otp = generateOTP();
+        const update = {
+          $set: {
+            otp_send_time: currentDateTime,
+            otp: otp,
+          },
+        };
+        try {
+          user_object.updateuser(filter, update);
+        } catch (error) {
+          return res.status(500).json({ message: "server error" });
+        }
+        return res.status(200).json({ otp: otp });
+      }
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "server error" });
+  }
+};
+
+const user_verifyotp = (req, res) => {
+  const filter = { key: req.body.key };
+  try {
+    user_object.finduser(filter).then((result) => {
+      if (result == null) {
+        return res.status(404).json({ message: "no user not found" });
+      } else {
+        if (result.otp != null) {
+          if (result.otp === req.body.otp) {
+            const otp_send_time = result.otp_send_time;
+            const currentDateTime = new Date();
+            const timedifference = currentDateTime - otp_send_time;
+            const seconds = timedifference / 1000;
+            console.log(seconds);
+            const expireminutes = 2.5;
+            const expireseconds = expireminutes * 60;
+            if (seconds < expireseconds) {
+              const forget_password_key = generateRandomKey();
+              const update = {
+                $unset: {
+                  otp: 1,
+                  otp_send_time: 1,
+                },
+                $set: {
+                  forget_password_key: forget_password_key,
+                  forget_password_key_send_time: currentDateTime,
+                },
+              };
+              try {
+                user_object.updateuser(filter, update);
+                return res
+                  .status(200)
+                  .json({ forget_password_key: forget_password_key });
+              } catch (error) {
+                return res.status(500).json({ message: "server error" });
+              }
+            } else {
+              return res.status(409).json({ message: "otp expired" });
+            }
+          } else {
+            return res.status(409).json({ message: "invalid otp" });
+          }
+        } else {
+          return res.status(409).json({ message: "no otp generated" });
+        }
+      }
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "server error" });
+  }
+};
+
+const user_forgetpassword = (req, res) => {};
+
 module.exports = {
   user_post,
   user_get,
@@ -257,4 +345,6 @@ module.exports = {
   user_delete,
   user_sendverification,
   user_getverification,
+  user_sendotp,
+  user_verifyotp,
 };
