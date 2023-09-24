@@ -9,6 +9,8 @@ const {
   user_getverification,
   user_sendotp,
   user_verifyotp,
+  user_forgetpassword,
+  user_changepassword,
 } = require("../controller/user/api_user_controller.js");
 
 const {
@@ -68,8 +70,8 @@ const validateRequestBody_post = [
     next();
   },
 ];
-const postmiddleware = [validateRequestBody_post, verifyToken];
-router.post("/users", postmiddleware, user_post);
+const post_middleware = [validateRequestBody_post, verifyToken];
+router.post("/users", post_middleware, user_post);
 
 const validateRequestBody_get = [
   (req, res, next) => {
@@ -89,13 +91,13 @@ const validateRequestBody_get = [
     next();
   },
 ];
-const getmiddleware = [validateRequestBody_get, verifyToken];
-router.get("/users", getmiddleware, user_get);
+const get_middleware = [validateRequestBody_get, verifyToken];
+router.get("/users", get_middleware, user_get);
 
 const validateRequestBody_put = [
   (req, res, next) => {
     const numberOfFields = Object.keys(req.body).length;
-    const putallowedFields = ["name", "user", "password", "key"];
+    const putallowedFields = ["name", "user", "key"];
     if (numberOfFields == 0) {
       return res.status(400).json({ message: "no feild given" });
     }
@@ -117,8 +119,8 @@ const validateRequestBody_put = [
     next();
   },
 ];
-const putmiddleware = [validateRequestBody_put, verifyToken];
-router.put("/users", putmiddleware, user_put);
+const put_middleware = [validateRequestBody_put, verifyToken];
+router.put("/users", put_middleware, user_put);
 
 const validateRequestBody_delete = [
   (req, res, next) => {
@@ -137,8 +139,8 @@ const validateRequestBody_delete = [
     next();
   },
 ];
-const deletemiddleware = [validateRequestBody_delete, verifyToken];
-router.delete("/users", deletemiddleware, user_delete);
+const delete_middleware = [validateRequestBody_delete, verifyToken];
+router.delete("/users", delete_middleware, user_delete);
 
 const validateRequestBody_sendverify = [
   (req, res, next) => {
@@ -157,10 +159,10 @@ const validateRequestBody_sendverify = [
     next();
   },
 ];
-const sendverifymiddleware = [validateRequestBody_sendverify, verifyToken];
+const sendverify_middleware = [validateRequestBody_sendverify, verifyToken];
 router.get(
   "/users/sendverification",
-  sendverifymiddleware,
+  sendverify_middleware,
   user_sendverification
 );
 
@@ -181,8 +183,12 @@ const validateRequestBody_getverify = [
     next();
   },
 ];
-const getverifymiddleware = [validateRequestBody_getverify, verifyToken];
-router.get("/users/getverification", getverifymiddleware, user_getverification);
+const getverify_middleware = [validateRequestBody_getverify, verifyToken];
+router.get(
+  "/users/getverification",
+  getverify_middleware,
+  user_getverification
+);
 
 const validateRequestBody_sendotp = [
   (req, res, next) => {
@@ -201,8 +207,8 @@ const validateRequestBody_sendotp = [
     next();
   },
 ];
-const sendotpmiddleware = [validateRequestBody_sendotp, verifyToken];
-router.get("/users/sendotp", sendotpmiddleware, user_sendotp);
+const sendotp_middleware = [validateRequestBody_sendotp, verifyToken];
+router.get("/users/sendotp", sendotp_middleware, user_sendotp);
 
 const validateRequestBody_verifyotp = [
   (req, res, next) => {
@@ -222,12 +228,68 @@ const validateRequestBody_verifyotp = [
     next();
   },
 ];
-const verifyotpmiddleware = [validateRequestBody_verifyotp, verifyToken];
-router.get("/users/verifyotp", verifyotpmiddleware, user_verifyotp);
+const verifyotp_middleware = [validateRequestBody_verifyotp, verifyToken];
+router.get("/users/verifyotp", verifyotp_middleware, user_verifyotp);
 
+const validateRequestBody_forgetpassword = [
+  (req, res, next) => {
+    const numberOfFields = Object.keys(req.body).length;
+    if (numberOfFields == 0) {
+      return res.status(400).json({ message: "no feild given" });
+    }
+    next();
+  },
+  check("forget_password_key").exists().isString(),
+  check("key").exists().isString(),
+  check("password").exists().isString(),
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ message: "not in proper format" });
+    }
+    next();
+  },
+];
+const forgetpassword_middleware = [
+  validateRequestBody_forgetpassword,
+  verifyToken,
+];
+router.get(
+  "/users/forgetpassword",
+  forgetpassword_middleware,
+  user_forgetpassword
+);
+
+const validateRequestBody_changepassword = [
+  (req, res, next) => {
+    const numberOfFields = Object.keys(req.body).length;
+    if (numberOfFields == 0) {
+      return res.status(400).json({ message: "no feild given" });
+    }
+    next();
+  },
+  check("oldpassword").exists().isString(),
+  check("key").exists().isString(),
+  check("password").exists().isString(),
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ message: "not in proper format" });
+    }
+    next();
+  },
+];
+const changepassword_middleware = [
+  validateRequestBody_changepassword,
+  verifyToken,
+];
+router.get(
+  "/users/changepassword",
+  changepassword_middleware,
+  user_changepassword
+);
 
 //devicedata route
-
 
 const validateRequestBody_devicedata_post = [
   (req, res, next) => {

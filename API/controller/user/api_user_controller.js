@@ -9,18 +9,18 @@ const user_object = new Login();
 function generateRandomKey() {
   const length = 15;
   return crypto.randomBytes(length).toString("hex");
-}
+};
 
 function generateOTP() {
   const otp = Math.floor(100000 + Math.random() * 900000);
   return otp.toString();
-}
+};
 
 function encode_byte64(user, password) {
   const credentials = `${user}:${password}`;
   const base64Credentials = Buffer.from(credentials).toString("base64");
   return base64Credentials;
-}
+};
 
 function decode_byte64(base64Credentials) {
   const decodedCredentials = Buffer.from(base64Credentials, "base64").toString(
@@ -28,7 +28,7 @@ function decode_byte64(base64Credentials) {
   );
   const [user, password] = decodedCredentials.split(":");
   return [user, password];
-}
+};
 
 const user_post = (req, res) => {
   const newuser = req.body;
@@ -104,49 +104,25 @@ const user_put = (req, res) => {
         console.log("user not found");
         return res.status(404).json({ message: "user not found" });
       } else {
-        var filter = { key: userkey };
         [olduser, oldpassword] = decode_byte64(userkey);
         var update_data = body;
-        if (body.user != null && body.password != null) {
-          if (olduser == body.user) {
-            if (body.password != null) {
-              userkey = encode_byte64(body.user, body.password);
-            } else {
-              userkey = encode_byte64(body.user, oldpassword);
+        if (body.user != null) {
+          filter = { user: body.user };
+          user_object.finduser(filter).then((result) => {
+            if (result != null) {
+              return res.status(409).json({ message: "user already exits" });
             }
-          } else if (olduser != body.user) {
-            try {
-              filter = { user: body.user };
-              user_object.finduser(filter).then((result2) => {
-                if (result2 == null) {
-                  if (body.password != null) {
-                    userkey = encode_byte64(body.user, body.password);
-                  } else {
-                    userkey = encode_byte64(body.user, oldpassword);
-                  }
-                } else {
-                  return res
-                    .status(404)
-                    .json({ message: "user already exists" });
-                }
-              });
-            } catch (error) {
-              return res.status(500).json({ message: "server error" });
-            }
-          } else {
-            userkey = encode_byte64(olduser, body.password);
-          }
+          });
+          const key = encode_byte64(body.user, oldpassword);
+          update_data.key = key;
+          update_data.verified = false;
         }
-        if (userkey != null) {
-          update_data.key = userkey;
-        }
-        delete update_data.password;
         const currentDateTime = new Date();
         update_data.updated_time = currentDateTime;
         const update = { $set: update_data };
+        const filter1 = { key: userkey };
         try {
-          user_object.updateuser(filter, update);
-          console.log("user updated");
+          user_object.updateuser(filter1, update);
           return res.status(200).json({ message: "user updated" });
         } catch {
           return res.status(500).json({ message: "server error" });
@@ -336,7 +312,88 @@ const user_verifyotp = (req, res) => {
   }
 };
 
-const user_forgetpassword = (req, res) => {};
+const user_forgetpassword = (req, res) => {
+  const body = req.body;
+  const filter = { key: body.key };
+  try {
+    user_object.finduser(filter).then((result) => {
+      if (result == null) {
+        return res.status(404).json({ message: "no user not found" });
+      } else {
+        if (result.forget_password_key === body.forget_password_key) {
+          const forget_password_key_send_time =
+            result.forget_password_key_send_time;
+          const currentDateTime = new Date();
+          const timedifference =
+            currentDateTime - forget_password_key_send_time;
+          const seconds = timedifference / 1000;
+          console.log(seconds);
+          const expireminutes = 10;
+          const expireseconds = expireminutes * 60;
+          if (seconds < expireseconds) {
+            const [olduser, oldpassword] = decode_byte64(body.key);
+            const newkey = encode_byte64(olduser, body.password);
+            const update = {
+              $set: { key: newkey },
+              $unset: {
+                forget_password_key: 1,
+                forget_password_key_send_time: 1,
+              },
+            };
+            const update_filter = { key: body.key };
+            try {
+              user_object.updateuser(update_filter, update);
+              return res.status(200).json({ message: "password changed" });
+            } catch (error) {
+              return res.status(500).json({ message: "server error" });
+            }
+          } else {
+            return res
+              .status(409)
+              .json({ message: "forget_password_key expired" });
+          }
+        } else {
+          return res
+            .status(409)
+            .json({ message: "invalid forget_password_key" });
+        }
+      }
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "server error" });
+  }
+};
+
+const user_changepassword = (req, res) => {
+  const body = req.body;
+  try {
+    const filter = { key: body.key };
+    user_object.finduser(filter).then((result) => {
+      if (result == null) {
+        return res.status(404).json({ message: "no user not found" });
+      } else {
+        const [original_old_user, original_old_password] = decode_byte64(
+          body.key
+        );
+        if (original_old_password == body.oldpassword) {
+          try {
+            const newkey = encode_byte64(original_old_user, body.password);
+            const update = { $set: { key: newkey } };
+            const update_filter = { key: body.key };
+            user_object.updateuser(update_filter, update);
+            return res.status(200).json({ message: "password changed" });
+          } catch (error) {
+            return res.status(500).json({ message: "server error" });
+          }
+        } else {
+          return res.status(409).json({ message: "invalid oldpassword" });
+        }
+      }
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "server error" });
+  }
+};
 
 module.exports = {
   user_post,
@@ -347,4 +404,6 @@ module.exports = {
   user_getverification,
   user_sendotp,
   user_verifyotp,
+  user_forgetpassword,
+  user_changepassword,
 };
