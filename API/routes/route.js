@@ -92,7 +92,7 @@ const validateRequestBody_get = [
   },
 ];
 const get_middleware = [validateRequestBody_get, verifyToken];
-router.get("/users", get_middleware, user_get);
+router.post("/users/login", get_middleware, user_get);
 
 const validateRequestBody_put = [
   (req, res, next) => {
