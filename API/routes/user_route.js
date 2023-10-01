@@ -1,31 +1,25 @@
 const router = require("express").Router();
 const { check, validationResult } = require("express-validator");
+
 const {
   user_post,
   user_get,
+  user_get_session,
   user_put,
   user_delete,
-  user_sendverification,
-  user_getverification,
-  user_sendotp,
-  user_verifyotp,
+  user_sendverification_email,
+  user_getverification_email,
+  user_sendotp_email,
+  user_verifyotp_email,
   user_forgetpassword,
   user_changepassword,
+  user_sendverification_phone,
+  user_getverification_phone,
+  user_sendotp_phone,
+  user_verifyotp_phone,
 } = require("../controller/user/api_user_controller.js");
 
-const {
-  devicedata_post,
-} = require("../controller/devicedata/api_devicedata_controller.js");
-
-const {
-  inventory_post,
-  inventory_delete,
-  inventory_list,
-  inventory_update,
-  inventory_find,
-} = require("../controller/inventory/api_inventory_controller.js");
-
-const verifyToken = (req, res, next) => {
+const verifyTokenuser = (req, res, next) => {
   const authHeader = req.headers["authorization"];
   if (!authHeader) {
     console.log("no authorisation");
@@ -49,8 +43,6 @@ const verifyToken = (req, res, next) => {
   next();
 };
 
-// users
-
 const validateRequestBody_post = [
   (req, res, next) => {
     const numberOfFields = Object.keys(req.body).length;
@@ -70,8 +62,8 @@ const validateRequestBody_post = [
     next();
   },
 ];
-const post_middleware = [validateRequestBody_post, verifyToken];
-router.post("/users", post_middleware, user_post);
+const post_middleware = [validateRequestBody_post, verifyTokenuser];
+router.post("/", post_middleware, user_post);
 
 const validateRequestBody_get = [
   (req, res, next) => {
@@ -91,8 +83,28 @@ const validateRequestBody_get = [
     next();
   },
 ];
-const get_middleware = [validateRequestBody_get, verifyToken];
-router.post("/users/login", get_middleware, user_get);
+const get_middleware = [validateRequestBody_get, verifyTokenuser];
+router.post("/login", get_middleware, user_get);
+
+const validateRequestBody_get_session = [
+  (req, res, next) => {
+    const numberOfFields = Object.keys(req.body).length;
+    if (numberOfFields == 0) {
+      return res.status(400).json({ message: "no feild given" });
+    }
+    next();
+  },
+  check("session_id").exists().isString(),
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ message: "not in proper format" });
+    }
+    next();
+  },
+];
+const get_session = [validateRequestBody_get_session, verifyTokenuser];
+router.post("/login-session", get_session, user_get_session);
 
 const validateRequestBody_put = [
   (req, res, next) => {
@@ -119,8 +131,8 @@ const validateRequestBody_put = [
     next();
   },
 ];
-const put_middleware = [validateRequestBody_put, verifyToken];
-router.put("/users", put_middleware, user_put);
+const put_middleware = [validateRequestBody_put, verifyTokenuser];
+router.put("/", put_middleware, user_put);
 
 const validateRequestBody_delete = [
   (req, res, next) => {
@@ -139,10 +151,10 @@ const validateRequestBody_delete = [
     next();
   },
 ];
-const delete_middleware = [validateRequestBody_delete, verifyToken];
-router.delete("/users", delete_middleware, user_delete);
+const delete_middleware = [validateRequestBody_delete, verifyTokenuser];
+router.delete("/", delete_middleware, user_delete);
 
-const validateRequestBody_sendverify = [
+const validateRequestBody_sendverify_user = [
   (req, res, next) => {
     const numberOfFields = Object.keys(req.body).length;
     if (numberOfFields == 0) {
@@ -159,14 +171,17 @@ const validateRequestBody_sendverify = [
     next();
   },
 ];
-const sendverify_middleware = [validateRequestBody_sendverify, verifyToken];
-router.get(
-  "/users/sendverification",
+const sendverify_middleware = [
+  validateRequestBody_sendverify_user,
+  verifyTokenuser,
+];
+router.post(
+  "/sendverification",
   sendverify_middleware,
-  user_sendverification
+  user_sendverification_email
 );
 
-const validateRequestBody_getverify = [
+const validateRequestBody_getverify_user = [
   (req, res, next) => {
     const numberOfFields = Object.keys(req.body).length;
     if (numberOfFields == 0) {
@@ -183,14 +198,17 @@ const validateRequestBody_getverify = [
     next();
   },
 ];
-const getverify_middleware = [validateRequestBody_getverify, verifyToken];
-router.get(
-  "/users/getverification",
+const getverify_middleware = [
+  validateRequestBody_getverify_user,
+  verifyTokenuser,
+];
+router.post(
+  "/getverification",
   getverify_middleware,
-  user_getverification
+  user_getverification_email
 );
 
-const validateRequestBody_sendotp = [
+const validateRequestBody_sendotp_user = [
   (req, res, next) => {
     const numberOfFields = Object.keys(req.body).length;
     if (numberOfFields == 0) {
@@ -198,7 +216,7 @@ const validateRequestBody_sendotp = [
     }
     next();
   },
-  check("key").exists().isString(),
+  check("user").exists().isString(),
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -207,10 +225,10 @@ const validateRequestBody_sendotp = [
     next();
   },
 ];
-const sendotp_middleware = [validateRequestBody_sendotp, verifyToken];
-router.get("/users/sendotp", sendotp_middleware, user_sendotp);
+const sendotp_middleware = [validateRequestBody_sendotp_user, verifyTokenuser];
+router.post("/sendotp", sendotp_middleware, user_sendotp_email);
 
-const validateRequestBody_verifyotp = [
+const validateRequestBody_verifyotp_user = [
   (req, res, next) => {
     const numberOfFields = Object.keys(req.body).length;
     if (numberOfFields == 0) {
@@ -219,7 +237,7 @@ const validateRequestBody_verifyotp = [
     next();
   },
   check("otp").exists().isString(),
-  check("key").exists().isString(),
+  check("user").exists().isString(),
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -228,8 +246,11 @@ const validateRequestBody_verifyotp = [
     next();
   },
 ];
-const verifyotp_middleware = [validateRequestBody_verifyotp, verifyToken];
-router.get("/users/verifyotp", verifyotp_middleware, user_verifyotp);
+const verifyotp_middleware = [
+  validateRequestBody_verifyotp_user,
+  verifyTokenuser,
+];
+router.post("/verifyotp", verifyotp_middleware, user_verifyotp_email);
 
 const validateRequestBody_forgetpassword = [
   (req, res, next) => {
@@ -240,7 +261,6 @@ const validateRequestBody_forgetpassword = [
     next();
   },
   check("forget_password_key").exists().isString(),
-  check("key").exists().isString(),
   check("password").exists().isString(),
   (req, res, next) => {
     const errors = validationResult(req);
@@ -252,13 +272,9 @@ const validateRequestBody_forgetpassword = [
 ];
 const forgetpassword_middleware = [
   validateRequestBody_forgetpassword,
-  verifyToken,
+  verifyTokenuser,
 ];
-router.get(
-  "/users/forgetpassword",
-  forgetpassword_middleware,
-  user_forgetpassword
-);
+router.post("/forgetpassword", forgetpassword_middleware, user_forgetpassword);
 
 const validateRequestBody_changepassword = [
   (req, res, next) => {
@@ -281,17 +297,11 @@ const validateRequestBody_changepassword = [
 ];
 const changepassword_middleware = [
   validateRequestBody_changepassword,
-  verifyToken,
+  verifyTokenuser,
 ];
-router.get(
-  "/users/changepassword",
-  changepassword_middleware,
-  user_changepassword
-);
+router.post("/changepassword", changepassword_middleware, user_changepassword);
 
-//devicedata route
-
-const validateRequestBody_devicedata_post = [
+const validateRequestBody_sendverify_phone = [
   (req, res, next) => {
     const numberOfFields = Object.keys(req.body).length;
     if (numberOfFields == 0) {
@@ -299,96 +309,24 @@ const validateRequestBody_devicedata_post = [
     }
     next();
   },
-  check("soilmoisture").exists().isNumeric(),
-  check("temperature").exists().isNumeric(),
+  check("key").exists().isString(),
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ message: "not in proper format" });
+    }
+    next();
+  },
+];
+const sendverify_middleware_phone = [
+  validateRequestBody_sendverify_phone,
+  verifyTokenuser,
 ];
 
 router.post(
-  "/devicedata",
-  validateRequestBody_devicedata_post,
-  devicedata_post
-);
-
-//inventory route
-
-const validateRequestBody_inventory_post = [
-  (req, res, next) => {
-    const numberOfFields = Object.keys(req.body).length;
-    if (numberOfFields == 0) {
-      return res.status(400).json({ message: "no feild given" });
-    }
-    next();
-  },
-  check("device").exists().isString(),
-  check("deviceid").exists().isNumeric(),
-];
-
-router.post("/inventory", validateRequestBody_inventory_post, inventory_post);
-
-const validateRequestBody_inventory_delete = [
-  (req, res, next) => {
-    const numberOfFields = Object.keys(req.body).length;
-    if (numberOfFields == 0) {
-      return res.status(400).json({ message: "no feild given" });
-    }
-    next();
-  },
-  check("deviceid").exists().isNumeric(),
-];
-
-router.delete(
-  "/inventory",
-  validateRequestBody_inventory_delete,
-  inventory_delete
-);
-
-const validateRequestBody_inventory_find = [
-  (req, res, next) => {
-    const numberOfFields = Object.keys(req.body).length;
-    if (numberOfFields == 0) {
-      return res.status(400).json({ message: "no feild given" });
-    }
-    next();
-  },
-  check("device").exists().isString(),
-];
-
-router.get("/inventory", validateRequestBody_inventory_find, inventory_find);
-
-const validateRequestBody_inventory_list = [
-  (req, res, next) => {
-    const numberOfFields = Object.keys(req.body).length;
-    if (numberOfFields == 0) {
-      return res.status(400).json({ message: "no feild given" });
-    }
-    next();
-  },
-  check("device").exists().isString(),
-];
-
-router.get(
-  "/inventory/all",
-  validateRequestBody_inventory_list,
-  inventory_list
-);
-
-const validateRequestBody_inventory_update = [
-  (req, res, next) => {
-    const numberOfFields = Object.keys(req.body).length;
-    if (numberOfFields == 0) {
-      return res.status(400).json({ message: "no feild given" });
-    }
-    next();
-  },
-  check("device").exists().isString(),
-  check("olddeviceid").exists().isNumeric(),
-  check("newdeviceid").exists().isNumeric(),
-];
-
-router.put(
-  "/inventory",
-  validateRequestBody_inventory_update,
-  inventory_update
+  "/sendverification",
+  sendverify_middleware_phone,
+  user_sendverification_phone
 );
 
 module.exports = router;

@@ -1,6 +1,6 @@
 const nodemailer = require("nodemailer");
 
-const verification_link_sender = (email, verifyurl) => {
+const otp_mailer = (email, otp) => {
   var emailTemplate =
     "<!DOCTYPE html>\n" +
     "<html>\n" +
@@ -65,11 +65,11 @@ const verification_link_sender = (email, verifyurl) => {
     '      <div class="content">\n' +
     '        <h1 class="heading">Welcome To The Leaf Reminder!</h1>\n' +
     '        <p class="welcome-text">Hi User, welcome to Leaf-Reminder. Great to have you on board.</p>\n' +
-    '        <h2 class="step-heading">1. Verify your account</h2>\n' +
-    '        <p class="step-description">To ensure you\'re legitimate and not some fake person, please verify your account by clicking the button below.</p>\n' +
-    '        <a class="action-button" href="' +
-    verifyurl +
-    '"        >Verify My Account</a>\n' +
+    '        <h2 class="step-heading">Forget Password</h2>\n' +
+    '        <p class="step-description">Your forget password OTP.</p>\n' +
+    "        <h1>" +
+    otp +
+    '        </h1>\n' +
     "      </div>\n" +
     "    </div>\n" +
     '    <div class="footer">\n' +
@@ -77,8 +77,6 @@ const verification_link_sender = (email, verifyurl) => {
     "    </div>\n" +
     "  </body>\n" +
     "</html>";
-
-  console.log(verifyurl);
 
   const transporter = nodemailer.createTransport({
     host: "smtp-relay.sendinblue.com",
@@ -90,7 +88,7 @@ const verification_link_sender = (email, verifyurl) => {
     },
   });
   const message = {
-    from: '"Leaf reminder 👻" <Leaf@gmail.com>', // sender address
+    from: '"Leaf reminder" <Leaf@gmail.com>', // sender address
     to: email, // list of receivers
     subject: "otp ✔", // Subject line
     text: "url", // plain text body
@@ -107,6 +105,4 @@ const verification_link_sender = (email, verifyurl) => {
     });
 };
 
-verification_link_sender("mugunthannagalingam17@gmail.com","12345");
-
-// module.exports = { verification_link_sender };
+module.exports = { otp_mailer };

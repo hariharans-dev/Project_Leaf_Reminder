@@ -8,7 +8,13 @@ class Login {
         .db(process.env.DB_USER)
         .collection(process.env.COLLECTION_USER);
       const currentDateTime = new Date();
-      const resutl = collections.insertOne(data);
+      const resutl = collections.insertOne(data, {
+        writeConcern: {
+          w: "majority", // Use a valid write concern mode here
+          wtimeout: 0,
+          provenance: "clientSupplied",
+        },
+      });
       return resutl;
     } catch (error) {
       return error;
@@ -20,7 +26,13 @@ class Login {
       const collections = client
         .db(process.env.DB_USER)
         .collection(process.env.COLLECTION_USER);
-      const result = collections.findOne(filter);
+      const result = collections.findOne(filter, {
+        writeConcern: {
+          w: "majority", // Use a valid write concern mode here
+          wtimeout: 0,
+          provenance: "clientSupplied",
+        },
+      });
       return result;
     } catch (error) {
       return error;
@@ -32,8 +44,13 @@ class Login {
       .db(process.env.DB_USER)
       .collection(process.env.COLLECTION_USER);
     try {
-      const result = collections.updateOne(filter, update);
-      return result;
+      const result = collections.updateOne(filter, update, {
+        writeConcern: {
+          w: "majority", // Use a valid write concern mode here
+          wtimeout: 0,
+          provenance: "clientSupplied",
+        },
+      });
     } catch (error) {
       return error;
     }
@@ -44,7 +61,13 @@ class Login {
       .db(process.env.DB_USER)
       .collection(process.env.COLLECTION_USER);
     try {
-      const result = collections.deleteOne(filter);
+      const result = collections.deleteOne(filter, {
+        writeConcern: {
+          w: "majority", // Use a valid write concern mode here
+          wtimeout: 0,
+          provenance: "clientSupplied",
+        },
+      });
       console.log(`user deleted`);
       return result;
     } catch (error) {

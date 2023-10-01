@@ -4,52 +4,30 @@ const Inventory_data = require("./inventory_data_controller.js");
 const inventory_object = new Inventory_data();
 
 const inventory_post = (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ message: "not in proper format" });
-  }
-  const authHeader = req.headers["authorization"];
-  if (!authHeader) {
-    console.log("no authorisation");
-    return res
-      .status(401)
-      .json({ message: "authorization header is missing." });
-  }
-  const [authType, apiKey] = authHeader.split(" ");
-  if (authType !== "Bearer") {
-    console.log("invalid authorization header");
-    return res
-      .status(400)
-      .json({ message: "invalid Authorization header format." });
-  }
-  if (apiKey !== process.env.INVENTORY_APIKEY && apiKey !== ADMIN_APIKEY) {
-    return res.status(401).json({ message: "invalid Authorization" });
-  } else {
-    const currentDateTime = new Date();
-    const body = req.body;
-    const data = {
-      device: body.device,
-      deviceid: body.deviceid,
-      created_time: currentDateTime,
-    };
-    const filter = { deviceid: body.deviceid };
-    try {
-      inventory_object.find_device(filter).then((result) => {
-        if (result == null) {
-          try {
-            inventory_object.create_device(data);
-            console.log("device created");
-            return res.status(200).json({ message: "device created" });
-          } catch (error) {
-            return res.status(500).json({ message: "server error" });
-          }
-        } else {
-          return res.status(409).json({ message: "deviceid already exists" });
+  const currentDateTime = new Date();
+  const body = req.body;
+  const data = {
+    device: body.device,
+    deviceid: body.deviceid,
+    created_time: currentDateTime,
+  };
+  const filter = { deviceid: body.deviceid };
+  try {
+    inventory_object.find_device(filter).then((result) => {
+      if (result == null) {
+        try {
+          inventory_object.create_device(data);
+          console.log("device created");
+          return res.status(200).json({ message: "device created" });
+        } catch (error) {
+          return res.status(500).json({ message: "server error" });
         }
-      });
-    } catch (error) {
-      return res.status(500).json({ message: "server error" });
-    }
+      } else {
+        return res.status(409).json({ message: "deviceid already exists" });
+      }
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "server error" });
   }
 };
 

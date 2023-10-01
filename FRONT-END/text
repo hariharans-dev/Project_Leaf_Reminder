@@ -1,0 +1,64 @@
+import React, { useEffect } from 'react';
+
+const App: React.FC = () => {
+  const getButtons = (e: React.MouseEvent) => {
+    e.preventDefault();
+  };
+
+  const changeForm = (e: React.MouseEvent) => {
+    const switchCtn = document.querySelector<HTMLDivElement>("#switch-cnt");
+    const switchC1 = document.querySelector<HTMLDivElement>("#switch-c1");
+    const switchC2 = document.querySelector<HTMLDivElement>("#switch-c2");
+    const switchCircle = document.querySelectorAll<HTMLDivElement>(".switch__circle");
+    const aContainer = document.querySelector<HTMLDivElement>("#a-container");
+    const bContainer = document.querySelector<HTMLDivElement>("#b-container");
+
+    if (switchCtn && switchC1 && switchC2 && switchCircle && aContainer && bContainer) {
+      switchCtn.classList.add("is-gx");
+      setTimeout(function () {
+        switchCtn.classList.remove("is-gx");
+      }, 1500);
+
+      switchCtn.classList.toggle("is-txr");
+      switchCircle[0].classList.toggle("is-txr");
+      switchCircle[1].classList.toggle("is-txr");
+
+      switchC1.classList.toggle("is-hidden");
+      switchC2.classList.toggle("is-hidden");
+      aContainer.classList.toggle("is-txl");
+      bContainer.classList.toggle("is-txl");
+      bContainer.classList.toggle("is-z200");
+    }
+  };
+
+  useEffect(() => {
+    const allButtons = document.querySelectorAll<HTMLButtonElement>(".submit");
+    const switchBtn = document.querySelectorAll<HTMLButtonElement>(".switch-btn");
+
+    allButtons.forEach(button => {
+      button.addEventListener("click", getButtons);
+    });
+
+    switchBtn.forEach(button => {
+      button.addEventListener("click", changeForm);
+    });
+
+    return () => {
+      allButtons.forEach(button => {
+        button.removeEventListener("click", getButtons);
+      });
+
+      switchBtn.forEach(button => {
+        button.removeEventListener("click", changeForm);
+      });
+    };
+  }, []);
+
+  return (
+    <div className="App">
+      {/* Your HTML content here */}
+    </div>
+  );
+}
+
+export default App;

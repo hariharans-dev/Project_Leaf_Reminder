@@ -1,69 +1,30 @@
 const express = require("express");
-const cors = require("cors");
+const cookieParser = require("cookie-parser");
+
 const app = express();
-app.use(express.json());
-const axios = require("axios");
-const port = 3000;
 
-app.use(cors());
+// Use cookie-parser middleware to handle cookies
+app.use(cookieParser());
 
-app.get("/forgetpassword", async (req, res) => {
-  try {
-    const requestData = {
-      user: req.body.user,
-      password: req.body.password,
-    };
+app.get("/set-cookie", (req, res) => {
+  // Set a cookie with the name 'user' and the value 'hari'
+  const user = "user";
+  const name = "hari";
+  res.cookie(user, name);
+  res.send("Cookie saved: user=hari");
+});
 
-    const apiUrl = "http://localhost:5000/api/users";
-
-    const response = await axios({
-      method: "get",
-      url: apiUrl,
-      data: requestData,
-    });
-
-    const responseData = response.data;
-
-    return res.json(responseData);
-  } catch (error) {
-    console.error("Error:");
-    return res.send("error");
+app.get("/get-cookie", (req, res) => {
+  // Retrieve and print the value of the 'user' cookie
+  const userCookie = req.cookies.user;
+  console.log(userCookie);
+  if (userCookie) {
+    res.send(`User: ${userCookie}`);
+  } else {
+    res.send("User cookie not found.");
   }
 });
 
-app.get("/signin", async (req, res) => {});
-
-const request_data = async (url, body, method, res) => {
-  try {
-    const response = await axios({
-      method: method,
-      url: url,
-      data: body,
-    });
-    
-    const responseData = response.data.key;
-    
-    return res.status(response.status).json({
-      status: response.status,
-      key: responseData,
-    });
-  } catch (error) {
-    if (error.response) {
-      // Axios error with a response from the server
-      return res.status(error.response.status).json({
-        status: error.response.status,
-        data: error.response.data.message,
-      });
-    } else {
-      // Axios error with no response from the server
-      return res.status(500).json({
-        message: error.message,
-      });
-    }
-  }
-};
-
-
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+app.listen(3000, () => {
+  console.log("Server is running on port 3000");
 });
