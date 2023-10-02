@@ -1,23 +1,16 @@
 const axios = require("axios");
 const express = require("express");
-const session = require("express-session");
 const bodyParser = require("body-parser");
+const cors = require("cors");
 
 const app = express();
 app.use(bodyParser.json());
+app.use(cors());
 
 const { otp_mailer } = require("../functions/otp_mailer");
 
-app.use(
-  session({
-    secret: "your-secret-key",
-    resave: false,
-    saveUninitialized: true,
-  })
-);
-
 const user_session = (req, res) => {
-  const data = { session_id: cookie.session_id };
+  const data = { session_id: req.body.session_id };
   const url = "http://localhost:5000/api/users/login-session";
   const headers = {
     "Content-Type": "application/json",
@@ -29,9 +22,7 @@ const user_session = (req, res) => {
       .then((response) => {
         console.log("response: ", response.data);
         response.data.status = response.status;
-        return res
-          .cookie(session_id, response.data.session_id)
-          .json(response.data);
+        return res.json(response.data);
       })
       .catch((error) => {
         try {
@@ -61,9 +52,6 @@ const user_login = (req, res) => {
       .then((response) => {
         console.log("response: ", response.data);
         response.data.status = response.status;
-        console.log(response.data.session_id);
-        req.session.session_id = response.data.session_id;
-        console.log(req.session.session_id);
         return res.json(response.data);
       })
       .catch((error) => {

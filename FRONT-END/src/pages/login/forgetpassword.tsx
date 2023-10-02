@@ -1,16 +1,11 @@
-import Button from "./Button";
+import Button from "../../components/Button";
 import { useState, useEffect } from "react";
-import Inputtag from "./Inputtag";
+import Inputtag from "../../components/Inputtag";
 import axios, { AxiosResponse } from "axios";
+import { useNavigate } from "react-router-dom";
 import "./style/forget.css";
 
-interface Props {
-  doneforgetpassword: (value: string) => void;
-  error: (value: boolean) => void;
-}
-
-function Forgetpassword({ doneforgetpassword, error }: Props) {
-  var [servererror, setservererror] = useState(false);
+function Forgetpassword() {
   var [forgetpassworderror, setforgetpassworderror] = useState("");
 
   var [user, setuser] = useState("");
@@ -24,10 +19,11 @@ function Forgetpassword({ doneforgetpassword, error }: Props) {
   var [reforgetpassword, setreforgetpassword] = useState("");
   var [forgettab, setforgettab] = useState(false);
 
-  useEffect(() => {
-    error(servererror);
-  }, [servererror]);
+  const navigate = useNavigate();
 
+  const doneforgetpassword = () => {
+    navigate("/");
+  };
   const validatepassword = (password: string): boolean => {
     const PasswordPattern =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{10,15}$/;
@@ -65,7 +61,7 @@ function Forgetpassword({ doneforgetpassword, error }: Props) {
           .then((response: AxiosResponse) => {
             console.log("Response:", response.data);
             if (response.data.status == 500) {
-              setservererror(true);
+              navigate("/error");
             } else {
               const status = response.data.status;
               if (status == 200) {
@@ -84,17 +80,17 @@ function Forgetpassword({ doneforgetpassword, error }: Props) {
                 error.response.status,
                 error.response.data
               );
-              setservererror(true);
+              navigate("/error");
             } else if (error.request) {
-              setservererror(true);
+              navigate("/error");
               console.error("No Response:", error.request);
             } else {
-              setservererror(true);
+              navigate("/error");
               console.error("Error:", error.message);
             }
           });
       } catch (error) {
-        setservererror(true);
+        navigate("/error");
       }
     }
   };
@@ -120,7 +116,7 @@ function Forgetpassword({ doneforgetpassword, error }: Props) {
           .then((response: AxiosResponse) => {
             console.log("Response:", response.data);
             if (response.data.status == 500) {
-              setservererror(true);
+              navigate("/error");
             } else {
               const status = response.data.status;
               if (status == 200) {
@@ -140,17 +136,17 @@ function Forgetpassword({ doneforgetpassword, error }: Props) {
                 error.response.status,
                 error.response.data
               );
-              setservererror(true);
+              navigate("/error");
             } else if (error.request) {
-              setservererror(true);
+              navigate("/error");
               console.error("No Response:", error.request);
             } else {
-              setservererror(true);
+              navigate("/error");
               console.error("Error:", error.message);
             }
           });
       } catch (error) {
-        setservererror(true);
+        navigate("/error");
       }
     }
   };
@@ -182,14 +178,14 @@ function Forgetpassword({ doneforgetpassword, error }: Props) {
           .then((response: AxiosResponse) => {
             console.log("Response:", response.data);
             if (response.data.status == 500) {
-              setservererror(true);
+              navigate("/error");
             } else {
               const status = response.data.status;
               if (status == 200) {
                 setotptab(false);
                 setforgettab(false);
                 setusertab(false);
-                doneforgetpassword("password changed");
+                doneforgetpassword();
               } else {
                 setforgetpassworderror(response.data.message);
               }
@@ -202,17 +198,17 @@ function Forgetpassword({ doneforgetpassword, error }: Props) {
                 error.response.status,
                 error.response.data
               );
-              setservererror(true);
+              navigate("/error");
             } else if (error.request) {
-              setservererror(true);
+              navigate("/error");
               console.error("No Response:", error.request);
             } else {
-              setservererror(true);
+              navigate("/error");
               console.error("Error:", error.message);
             }
           });
       } catch (error) {
-        setservererror(true);
+        navigate("/error");
       }
     }
   };
@@ -239,7 +235,7 @@ function Forgetpassword({ doneforgetpassword, error }: Props) {
           .then((response: AxiosResponse) => {
             console.log("Response:", response.data);
             if (response.data.status == 500) {
-              setservererror(true);
+              navigate("/error");
             } else {
               const status = response.data.status;
               if (status == 200) {
@@ -256,17 +252,17 @@ function Forgetpassword({ doneforgetpassword, error }: Props) {
                 error.response.status,
                 error.response.data
               );
-              setservererror(true);
+              navigate("/error");
             } else if (error.request) {
-              setservererror(true);
+              navigate("/error");
               console.error("No Response:", error.request);
             } else {
-              setservererror(true);
+              navigate("/error");
               console.error("Error:", error.message);
             }
           });
       } catch (error) {
-        setservererror(true);
+        navigate("/error");
       }
     }
   };
@@ -304,7 +300,7 @@ function Forgetpassword({ doneforgetpassword, error }: Props) {
                 theme="btn-secondary d-block"
                 content="back"
                 onclick={() => {
-                  doneforgetpassword("");
+                  doneforgetpassword();
                   setforgetpassworderror("");
                 }}
               />

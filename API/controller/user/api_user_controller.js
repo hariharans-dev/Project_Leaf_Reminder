@@ -110,35 +110,32 @@ const user_get = (req, res) => {
 
 const user_get_session = (req, res) => {
   const body = req.body;
+  console.log(body);
   const filter = { session_id: body.session_id };
   try {
     user_object.finduser(filter).then((result) => {
       if (result == null) {
         return res.status(404).json({ message: "session not found" });
       } else {
-        if (!result.verified) {
-          return res.status(409).json({ message: "user not verified" });
+        const session_time = result.session_time;
+        const currentDateTime = new Date();
+        const timedifference = currentDateTime - session_time;
+        const seconds = timedifference / 1000;
+        console.log(seconds);
+        const expirehours = 24;
+        const expireminutes = expirehours * 60;
+        const expireseconds = expireminutes * 60;
+        console.log(seconds);
+        if (seconds < expireseconds) {
+          return res.status(200).json({ message: "session authenticated" });
         } else {
-          const session_time = result.session_time;
-          const currentDateTime = new Date();
-          const timedifference = currentDateTime - session_time;
-          const seconds = timedifference / 1000;
-          console.log(seconds);
-          const expirehours = 24;
-          const expireminutes = expirehours * 60;
-          const expireseconds = expireminutes * 60;
-          console.log(seconds);
-          if (seconds < expireseconds) {
-            return res.status(200).json({ message: "session authenticated" });
-          } else {
-            const filter = { key: result.key };
-            const update = { $unset: { session_id: 1, session_time: 1 } };
-            try {
-              user_object.updateuser(filter, update);
-              return res.status(409).json({ message: "session not found" });
-            } catch (error) {
-              return res.status(500).json({ message: "server error" });
-            }
+          const filter = { key: result.key };
+          const update = { $unset: { session_id: 1, session_time: 1 } };
+          try {
+            user_object.updateuser(filter, update);
+            return res.status(409).json({ message: "session not found" });
+          } catch (error) {
+            return res.status(500).json({ message: "server error" });
           }
         }
       }
