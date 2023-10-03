@@ -122,6 +122,7 @@ const user_verifyotp = (req, res) => {
           forget_password_key: forget_password_key,
           status: 200,
         };
+        console.log(result);
         return res.json(result);
       })
       .catch((error) => {

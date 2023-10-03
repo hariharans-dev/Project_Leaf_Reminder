@@ -153,7 +153,7 @@ export default function Login() {
             theme=""
             content="forgetpassword"
             onclick={() => {
-              navigate("/forgetpassword");
+              navigate("/forgetpassword/forgetuser");
             }}
           />
           <div className="login-btn">

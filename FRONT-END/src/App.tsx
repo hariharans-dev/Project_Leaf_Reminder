@@ -1,13 +1,15 @@
 import Login from "./pages/login/login";
-import Forgetpassword from "./pages/login/forgetpassword";
 import Layout from "./pages/dashboard/layout";
 import Home from "./pages/dashboard/home";
 import Blogs from "./pages/dashboard/blog";
 import Contact from "./pages/dashboard/contact";
 import NoPage from "./pages/dashboard/nopage";
+import Server_error from "./pages/error/servererror";
+import Forget_user from "./pages/login/forgetuser";
+import Forget_otp from "./pages/login/forgetotp";
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Server_error from "./pages/error/servererror";
+import Forgetpassword from "./pages/login/forgetpassword";
 
 export default function App() {
   return (
@@ -16,7 +18,11 @@ export default function App() {
         <Routes>
           <Route path="/">
             <Route index element={<Login />} />
-            <Route path="/forgetpassword" element={<Forgetpassword />} />
+          </Route>
+          <Route path="/forgetpassword/*">
+            <Route path="forgetuser" element={<Forget_user />} />
+            <Route path="verifyotp" element={<Forget_otp />} />
+            <Route path="forgetpassword" element={<Forgetpassword />} />
           </Route>
 
           <Route path="/dashboard/*" element={<Layout />}>
