@@ -1,67 +1,144 @@
-.login-box {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-  border: 5px solid;
-  width: 40%;
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap");
+.box {
+  height: 100%;
+}
+.login-img-frame {
+  margin-top: 30px;
+}
+.left-box,
+.right-box {
+  min-height: 100vh; /* Set minimum height to 100% of viewport height */
+}
+.left-box {
+  background-color: #aae057;
+}
+.login-img {
+  width: 60%;
+  height: 60%;
 }
 
-.input {
-  padding: 15px;
-  padding-right: 70px;
+.welcome-content {
+  color: white;
+  font-size: 30px;
+  font-weight: 600;
+  font-family: "Montserrat", sans-serif;
 }
 
-.btn {
-  display: flex;
-  justify-content: center;
+.coat-content {
+  color: white;
+  font-size: 30px;
+  font-weight: 500;
+  font-family: "Montserrat", sans-serif;
 }
 
-.login-btn {
-  margin-top: 20px;
-  margin-bottom: 20px;
+.green-text {
+  color: green;
+  font-size: 30px;
+  font-weight: 600;
+  font-family: "Montserrat", sans-serif;
+  margin-left: 5px;
 }
 
-.status {
-  bottom: 0px;
+.logo-img {
+  width: 90%;
+  height: 90%;
 }
 
-@media screen and (max-width: 768px) {
-  .login-box {
-    width: 80%; /* Decrease width for smaller screens */
+.label-text {
+  color: #1ca3ec;
+  font-family: Montserrat;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 30px;
+  margin-bottom: 15px;
+}
+
+.forgetpassword-text {
+  color: #1ca3ec;
+  font-family: Montserrat;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 30px;
+  margin-bottom: 5px;
+}
+
+.login-button {
+  background-color: #1ca3ec;
+  color: white;
+  font-size: large;
+  font-weight: 500;
+}
+
+.ipt {
+  background-color: #dddddd;
+  border: #dddddd;
+}
+
+@media (max-width: 1200px) {
+  .logo-img {
+    width: 70%;
+    height: 70%;
+  }
+  .welcome-content,
+  .coat-content,
+  .green-text {
+    font-size: 24px;
   }
 
-  .input {
-    padding: 10px; /* Adjust padding for smaller screens */
-    padding-left: 20px;
-    padding-right: 20px;
-  }
-
-  .login-btn {
-    margin-top: 10px; /* Adjust margins for smaller screens */
-    margin-bottom: 10px;
+  .label-text {
+    font-size: 14px;
+    line-height: 24px;
   }
 }
 
-/* Responsive styles for even smaller screens */
-@media screen and (max-width: 480px) {
-  .login-box {
-    width: 90%; /* Further decrease width for even smaller screens */
+@media (max-width: 1000px) {
+  .welcome-content,
+  .coat-content,
+  .green-text {
+    font-size: 18px;
   }
 
-  .input {
-    padding: 5px; /* Adjust padding for even smaller screens */
-    padding-left: 10px;
-    padding-right: 10px;
+  .label-text {
+    font-size: 10px;
+    line-height: 20px;
   }
+}
 
-  .login-btn {
-    margin-top: 5px; /* Further adjust margins for even smaller screens */
-    margin-bottom: 5px;
+@media (max-width: 769px) {
+  .left-box,
+  .right-box {
+    min-height: 50px;
+  }
+  .login-img {
+    width: 40%;
+  }
+  .login-img-frame {
+    margin-bottom: 20px;
+    margin-top: 10px;
+  }
+  .login-img {
+    width: 30%;
+  }
+  .logo-img {
+    width: 50%;
+  }
+}
+
+@media (max-width: 378px) {
+  .welcome-content,
+  .coat-content,
+  .green-text {
+    font-size: 15px;
+  }
+  .left-box,
+  .right-box {
+    min-height: 50px;
+  }
+  .login-img {
+    width: 30%;
+  }
+  .login-img-frame {
+    margin-bottom: 20px;
+    margin-top: 10px;
   }
 }

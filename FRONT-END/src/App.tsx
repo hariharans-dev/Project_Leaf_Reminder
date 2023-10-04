@@ -1,4 +1,5 @@
 import Login from "./pages/login/login";
+import 'bootstrap/dist/css/bootstrap.css';
 import Layout from "./pages/dashboard/layout";
 import Home from "./pages/dashboard/home";
 import Blogs from "./pages/dashboard/blog";

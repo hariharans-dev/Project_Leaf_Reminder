@@ -2,13 +2,15 @@ interface Props {
   content: string;
   onclick: () => void;
   theme: string;
+  id?: string;
 }
 
-function Button({ content, onclick, theme }: Props) {
+function Button({ content, onclick, id, theme }: Props) {
   return (
     <>
       <button
-        className={"btn " + theme}
+        id={id}
+        className={"" + theme}
         onClick={() => {
           onclick();
         }}

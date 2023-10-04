@@ -55,7 +55,7 @@ export default function Forgetpassword() {
             } else {
               const status = response.data.status;
               if (status == 200) {
-                navigate("/");
+                navigate("/?status=password changed");
               } else {
                 setforgetpassworderror(response.data.message);
               }

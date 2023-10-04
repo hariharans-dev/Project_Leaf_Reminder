@@ -4,15 +4,17 @@ interface Props {
   type: string;
   theme: string;
   value?: string;
+  id?: string;
 }
 
-function Inputtag({ content, type, placeholder, theme }: Props) {
+function Inputtag({ content, type, placeholder, id, theme }: Props) {
   return (
     <>
       <input
+        id={id}
         placeholder={placeholder}
         type={type}
-        className={"input " + theme}
+        className={"" + theme}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
           const value = e.target.value;
           content(value);
