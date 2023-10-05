@@ -2,6 +2,8 @@ import { useEffect } from "react";
 import axios, { AxiosResponse } from "axios";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useCookies } from "react-cookie";
+import "./style/servererror.css";
+import logo_png from "../../assets/full logo.png";
 
 export default function Server_error() {
   const navigate = useNavigate();
@@ -56,7 +58,30 @@ export default function Server_error() {
   }, []);
   return (
     <>
-      <h1>error code 404</h1>
+      <div className="error-page">
+        <div className="logo_png_frame">
+          <img className="logo_png" src={logo_png} alt="logo" />
+        </div>
+        <div className="server-error d-flex justify-content-center align-items-center">
+          <div className="">
+            <div className="error-content d-flex justify-content-center align-items-center">
+              ERROR
+            </div>
+            <div className="error-status-content d-flex justify-content-center align-items-center">
+              404
+            </div>
+            <div className="content d-flex justify-content-center align-items-center">
+              OOPS, SORRY WE COULDN'T FIND THE PAGE YOUR'E LOOKING FOR
+            </div>
+            <div className="content d-flex justify-content-center align-items-center">
+              PLEASE, RETURN TO THE{" "}
+              <button className="homepage btn" onClick={() => navigate("/")}>
+                HOMEPAGE
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </>
   );
 }

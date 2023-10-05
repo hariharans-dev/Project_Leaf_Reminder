@@ -94,52 +94,52 @@ export default function Login() {
     }
   };
 
-  // useEffect(() => {
-  //   const content =
-  //     searchParams.get("status") == null ? "" : searchParams.get("status");
-  //   setstatus(content + "");
-  //   const data = { session_id: cookies.session_id };
-  //   console.log(data);
-  //   const url = "http://localhost:4000/user/login-session";
-  //   const headers = {
-  //     "Content-Type": "application/json",
-  //   };
+  useEffect(() => {
+    const content =
+      searchParams.get("status") == null ? "" : searchParams.get("status");
+    setstatus(content + "");
+    const data = { session_id: cookies.session_id };
+    console.log(data);
+    const url = "http://localhost:4000/user/login-session";
+    const headers = {
+      "Content-Type": "application/json",
+    };
 
-  //   try {
-  //     axios
-  //       .post(url, data, { headers })
-  //       .then((response: AxiosResponse) => {
-  //         console.log("Response:", response.data);
-  //         if (response.data.status == 500) {
-  //           navigate("/error");
-  //         } else {
-  //           const status = response.data.status;
-  //           if (status == 200) {
-  //             console.log("cookie login");
-  //             login();
-  //           }
-  //         }
-  //       })
-  //       .catch((error) => {
-  //         if (error.response) {
-  //           console.error(
-  //             "Server Error:",
-  //             error.response.status,
-  //             error.response.data
-  //           );
-  //           navigate("/error");
-  //         } else if (error.request) {
-  //           navigate("/error");
-  //           console.error("No Response:", error.request);
-  //         } else {
-  //           navigate("/error");
-  //           console.error("Error:", error.message);
-  //         }
-  //       });
-  //   } catch (error) {
-  //     navigate("/error");
-  //   }
-  // }, []);
+    try {
+      axios
+        .post(url, data, { headers })
+        .then((response: AxiosResponse) => {
+          console.log("Response:", response.data);
+          if (response.data.status == 500) {
+            navigate("/error");
+          } else {
+            const status = response.data.status;
+            if (status == 200) {
+              console.log("cookie login");
+              login();
+            }
+          }
+        })
+        .catch((error) => {
+          if (error.response) {
+            console.error(
+              "Server Error:",
+              error.response.status,
+              error.response.data
+            );
+            navigate("/error");
+          } else if (error.request) {
+            navigate("/error");
+            console.error("No Response:", error.request);
+          } else {
+            navigate("/error");
+            console.error("Error:", error.message);
+          }
+        });
+    } catch (error) {
+      navigate("/error");
+    }
+  }, []);
 
   return (
     <>

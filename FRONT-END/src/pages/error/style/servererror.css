@@ -1,0 +1,157 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap");
+
+.server-error {
+  width: 100vw;
+  height: 100vh;
+  background-image: url("../../../assets/error_bg_img.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.error-content,
+.content {
+  color: #aae057;
+  font-family: Montserrat;
+  font-size: 25px;
+  font-weight: 600;
+  line-height: 37px;
+  letter-spacing: 0em;
+}
+.homepage,
+.error-status-content {
+  color: #1ca3ec;
+  font-family: Montserrat;
+  font-size: 25px;
+  font-weight: 600;
+  line-height: 37px;
+  letter-spacing: 0em;
+}
+
+.error-content {
+  font-size: 35px;
+}
+.error-status-content {
+  font-size: 100px;
+  margin-top: 30px;
+  margin-bottom: 40px;
+}
+.homepage {
+  margin-left: 10px;
+  margin-top: 0px;
+  background: none;
+}
+.logo_png_frame {
+  position: fixed;
+  margin: 40px;
+}
+
+@media (max-width: 950px) {
+  .error-content,
+  .content {
+    color: #aae057;
+    font-family: Montserrat;
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 37px;
+    letter-spacing: 0em;
+  }
+  .homepage,
+  .error-status-content {
+    color: #1ca3ec;
+    font-family: Montserrat;
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 37px;
+    letter-spacing: 0em;
+  }
+
+  .error-content {
+    font-size: 30px;
+  }
+  .error-status-content {
+    font-size: 90px;
+    margin-top: 20px;
+    margin-bottom: 30px;
+  }
+  .homepage {
+    margin-left: 10px;
+  }
+  .logo_png_frame {
+    position: fixed;
+    margin: 30px;
+  }
+}
+
+@media (max-width: 730px) {
+  .error-content,
+  .content {
+    color: #aae057;
+    font-family: Montserrat;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 37px;
+    letter-spacing: 0em;
+  }
+  .homepage,
+  .error-status-content {
+    color: #1ca3ec;
+    font-family: Montserrat;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 37px;
+    letter-spacing: 0em;
+  }
+
+  .error-content {
+    font-size: 25px;
+  }
+  .error-status-content {
+    font-size: 70px;
+    margin-top: 20px;
+    margin-bottom: 30px;
+  }
+  .homepage {
+    margin-left: 10px;
+  }
+  .logo_png_frame {
+    position: fixed;
+    margin: 30px;
+  }
+}
+
+@media (max-width: 550px) {
+  .error-content,
+  .content {
+    color: #aae057;
+    font-family: Montserrat;
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 37px;
+    letter-spacing: 0em;
+  }
+  .homepage,
+  .error-status-content {
+    color: #1ca3ec;
+    font-family: Montserrat;
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 37px;
+    letter-spacing: 0em;
+  }
+
+  .error-content {
+    font-size: 20px;
+  }
+  .error-status-content {
+    font-size: 60px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+  }
+  .homepage {
+    margin-left: 10px;
+  }
+  .logo_png_frame {
+    position: fixed;
+    margin: 30px;
+  }
+}
