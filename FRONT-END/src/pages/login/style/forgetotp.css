@@ -76,6 +76,19 @@
   color: white;
 }
 
+.resend {
+  color: #1ca3ec;
+  font-family: Montserrat;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 30px;
+}
+
+.resend-button {
+  margin-top: 10px;
+  border: #1ca3ec solid;
+}
+
 .top {
   margin-top: 30px;
   margin-left: 60px;
@@ -130,7 +143,13 @@
   }
 }
 
-@media (max-width: 767px) {
+@media (max-width: 768px) {
+  .logo-img {
+    width: 10%;
+  }
+  .round-img-frame {
+    margin-top: 0px;
+  }
   .left-box {
     min-height: 40vh;
   }
@@ -140,13 +159,8 @@
   .round-img {
     width: 30%;
   }
-  .round-img-frame {
-    margin-top: 0px;
-    margin-bottom: 10px;
-  }
   .top {
     margin-top: 10px;
-    margin-bottom: 0px;
   }
   .bottom {
     margin-top: 0px;
@@ -157,6 +171,6 @@
   }
   .reset-content {
     font-size: 23px;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
   }
 }

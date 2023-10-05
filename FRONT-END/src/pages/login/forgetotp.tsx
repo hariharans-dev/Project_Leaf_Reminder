@@ -3,7 +3,9 @@ import { useState } from "react";
 import Inputtag from "../../components/Inputtag";
 import axios, { AxiosResponse } from "axios";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import "./style/forget.css";
+import "./style/forgetotp.css";
+import logo from "../../assets/logo.png";
+import forget_otp_img from "../../assets/otp_page_img.jpg";
 
 export default function Forget_otp() {
   var [otp, setotp] = useState("");
@@ -137,40 +139,74 @@ export default function Forget_otp() {
   };
   return (
     <>
-      <div className="center-box">
-        <div className="otp">
-          <div>
-            <Inputtag
-              theme="d-block"
-              type="text"
-              placeholder="otp"
-              content={(value: string) => {
-                setotp(value);
-              }}
-            />
+      <div className="otp">
+        <div className="row">
+          <div className="col-lg-6 col-md-6 left-box d-flex justify-content-center align-items-center">
+            <div>
+              <div className="welcome-content d-flex justify-content-center">
+                WELCOME TO LEAF REMINDER
+              </div>
+              <div className="coat-content d-flex justify-content-center">
+                WHERE CONVINENCE MEETS <span className="green-text">GREEN</span>
+              </div>
+              <div className="round-img-frame d-flex justify-content-center">
+                <img
+                  src={forget_otp_img}
+                  alt=""
+                  className="round-img rounded-circle"
+                />
+              </div>
+            </div>
           </div>
-          <div className="status text-danger">{forgetpassworderror}</div>
-
-          <div>
-            <Button
-              theme="btn-outline-danger mt-3 mb-2"
-              content="verify otp"
-              onclick={verify_otp}
-            />
+          <div className="col-lg-6 col-md-6 right-box">
+            <div className="d-flex flex-column">
+              <div className="top d-flex justify-content-between">
+                <button
+                  className="btn"
+                  onClick={() => navigate("/forgetpassword/forgetuser")}
+                >
+                  <span className="back-arrow material-symbols-outlined">
+                    arrow_back
+                  </span>
+                </button>
+                <img src={logo} alt="logo" className="logo-img" />
+              </div>
+              <div className="bottom d-flex justify-content-center align-items-center">
+                <div>
+                  <div className="reset-content">RESET YOUR PASSWORD</div>
+                  <div>
+                    <div className="user d-flex flex-column">
+                      <label className="label-text d-flex justify-content-between">
+                        Enter OTP
+                      </label>
+                      <input
+                        type="text"
+                        className="input"
+                        placeholder="ENTER OTP"
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                          const value = e.target.value;
+                          setotp(value);
+                        }}
+                      />
+                    </div>
+                    <div className="login-button d-flex justify-content-center">
+                      <button className="btn login-button" onClick={verify_otp}>
+                        VERIFY OTP
+                      </button>
+                    </div>
+                    <div className="resend-button d-flex justify-content-center">
+                      <button className="btn resend" onClick={resend_otp}>
+                        RESEND OTP
+                      </button>
+                    </div>
+                    <div className="d-flex justify-content-center m-3">
+                      <p className="text-danger">{forgetpassworderror}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <Button
-            theme="btn-outline-danger mt-1 mb-2"
-            content="resend otp"
-            onclick={resend_otp}
-          />
-
-          <Button
-            theme="btn-secondary back"
-            content="back"
-            onclick={() => {
-              navigate("/forgetpassword/forgetuser");
-            }}
-          />
         </div>
       </div>
     </>
