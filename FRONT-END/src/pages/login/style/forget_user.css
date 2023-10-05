@@ -1,0 +1,157 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap");
+
+.left-box,
+.right-box {
+  min-height: 100vh;
+}
+.left-box {
+  background-color: #aae057;
+}
+
+.round-img-frame {
+  margin-top: 30px;
+}
+.round-img {
+  width: 60%;
+  height: 60%;
+}
+
+.welcome-content {
+  color: white;
+  font-family: Montserrat;
+  font-size: 35px;
+  font-weight: 600;
+  line-height: 43px;
+  letter-spacing: 0em;
+}
+.coat-content {
+  color: white;
+  font-family: Montserrat;
+  font-size: 35px;
+  font-weight: 500;
+  line-height: 43px;
+  letter-spacing: 0em;
+}
+.green-text {
+  padding-left: 10px;
+  color: #497426;
+}
+
+.logo-img {
+  width: 15%;
+}
+
+.reset-content {
+  font-family: Montserrat;
+  font-size: 35px;
+  font-weight: 600;
+  line-height: 43px;
+  letter-spacing: 0em;
+  color: #1ca3ec;
+  margin-bottom: 30px;
+}
+.label-text {
+  font-family: Montserrat;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 30px;
+  letter-spacing: 0em;
+  color: #1ca3ec;
+  margin-bottom: 5px;
+}
+.input {
+  background-color: #dddddd;
+  padding: 10px;
+  border: white;
+  margin-bottom: 30px;
+}
+
+.login-button {
+  background-color: #1ca3ec;
+  font-family: Montserrat;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 30px;
+  letter-spacing: 0em;
+  color: white;
+}
+
+.top {
+  margin-top: 30px;
+  margin-left: 60px;
+  margin-right: 30px;
+}
+.bottom {
+  margin-top: 130px;
+}
+
+.back-arrow {
+  color: #1ca3ec;
+}
+
+@media (max-width: 1391px) {
+  .welcome-content,
+  .coat-content {
+    font-size: 30px;
+  }
+  .bottom {
+    margin-top: 150px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .top {
+    margin-right: 40px;
+    margin-left: 30px;
+  }
+  .welcome-content,
+  .coat-content {
+    font-size: 23px;
+  }
+}
+
+@media (max-width: 966px) {
+  .welcome-content,
+  .coat-content {
+    font-size: 20px;
+  }
+  .reset-content {
+    font-size: 30px;
+  }
+}
+
+@media (max-width: 829px) {
+  .welcome-content,
+  .coat-content {
+    font-size: 18px;
+  }
+  .reset-content {
+    font-size: 27px;
+  }
+}
+
+@media (max-width: 767px) {
+  .left-box {
+    min-height: 40vh;
+  }
+  .right-box {
+    min-height: 60vh;
+  }
+  .round-img {
+    width: 30%;
+  }
+  .top {
+    margin-top: 30px;
+    margin-bottom: 0px;
+  }
+  .bottom {
+    margin-top: 5%;
+  }
+  .welcome-content,
+  .coat-content {
+    font-size: 15px;
+  }
+  .reset-content {
+    font-size: 23px;
+  }
+}

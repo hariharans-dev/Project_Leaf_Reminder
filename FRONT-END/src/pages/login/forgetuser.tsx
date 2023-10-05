@@ -1,9 +1,10 @@
-import Inputtag from "../../components/Inputtag";
-import Button from "../../components/Button";
 import { useState } from "react";
 import axios, { AxiosResponse } from "axios";
 import { useNavigate } from "react-router-dom";
-import "./style/forget.css";
+import "./style/forget_user.css";
+
+import forget_user_img from "../../assets/forget-user.jpg";
+import logo_png from "../../assets/logo.png";
 
 export default function Forget_user() {
   var [user, setuser] = useState("");
@@ -73,35 +74,79 @@ export default function Forget_user() {
   };
   return (
     <>
-      <div className="center-box">
-        <div className="user">
-          <div id="user_input">
-            <Inputtag
-              type="text"
-              theme="d-block mt-2 mb-2"
-              placeholder={"user"}
-              content={(value: string) => {
-                setuser(value);
-              }}
-            />
-          </div>
-          <div className="status text-danger">{forgetpassworderror}</div>
-
-          <Button
-            theme="btn-outline-danger mt-3 mb-2"
-            content="generate otp"
-            onclick={generate_otp}
-          />
-
-          <div className="back">
-            <Button
-              theme="btn-secondary d-block"
-              content="back"
-              onclick={() => {
-                setforgetpassworderror("");
-                navigate("/");
-              }}
-            />
+      <div className="forget-user">
+        <div className="container-fluid">
+          <div className="row">
+            <div className="col-lg-6 col-md-6 left-box d-flex justify-content-center align-items-center">
+              <div>
+                <div className="welcome-content d-flex justify-content-center">
+                  WELCOME TO LEAF REMINDER
+                </div>
+                <div className="coat-content d-flex justify-content-center">
+                  WHERE CONVINENCE MEETS{" "}
+                  <span className="green-text">GREEN</span>
+                </div>
+                <div className="round-img-frame d-flex justify-content-center">
+                  <img
+                    src={forget_user_img}
+                    alt=""
+                    className="round-img rounded-circle"
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="col-lg-6 col-md-6 right-box">
+              <div className="d-flex flex-column">
+                <div className="top d-flex justify-content-between">
+                  <button
+                    className="btn"
+                    onClick={() => {
+                      setforgetpassworderror("");
+                      navigate("/");
+                    }}
+                  >
+                    <span className="back-arrow material-symbols-outlined">
+                      arrow_back
+                    </span>
+                  </button>
+                  <img src={logo_png} alt="logo" className="logo-img" />
+                </div>
+                <div className="bottom d-flex justify-content-center align-items-center">
+                  <div>
+                    <div className="reset-content">RESET YOUR PASSWORD</div>
+                    <div>
+                      <div className="user d-flex flex-column">
+                        <label className="label-text d-flex justify-content-between">
+                          Enter the Username
+                        </label>
+                        <input
+                          type="text"
+                          className="input"
+                          placeholder="ENTER USERNAME"
+                          onChange={(
+                            e: React.ChangeEvent<HTMLInputElement>
+                          ) => {
+                            const value = e.target.value;
+                            setuser(value);
+                          }}
+                        />
+                      </div>
+                      <div className="login-button d-flex justify-content-center">
+                        <button
+                          className="btn login-button"
+                          onClick={generate_otp}
+                        >
+                          GENERATE OTP
+                        </button>
+                      </div>
+                      <div className="d-flex justify-content-center m-3">
+                        <p className="text-danger">{forgetpassworderror}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
