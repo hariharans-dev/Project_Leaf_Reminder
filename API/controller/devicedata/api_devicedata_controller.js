@@ -18,75 +18,210 @@ function decode_byte64(base64Credentials) {
 }
 
 const devicedata_post = (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ message: "not in proper format" });
-  }
   const authHeader = req.headers["authorization"];
-  if (!authHeader) {
-    return res
-      .status(401)
-      .json({ message: "authorization header is missing." });
-  }
+
   const [authType, apiKey] = authHeader.split(" ");
-  if (authType !== "Bearer") {
-    return res
-      .status(400)
-      .json({ message: "invalid Authorization header format." });
-  }
+
   const [key, deviceid] = decode_byte64(apiKey);
   const body = req.body;
   const currentDateTime = new Date();
 
-  if (key === process.env.DEVICE_DATA_APIKEY || key === ADMIN_APIKEY) {
-    const filter = { deviceid: deviceid };
-    var data = {
-      deviceid: deviceid,
-      data: [
-        {
+  const filter = { deviceid: deviceid };
+  var data = {
+    deviceid: deviceid,
+    data: [
+      {
+        time: currentDateTime,
+        soilmoisture: body.soilmoisture,
+        temperature: body.temperature,
+      },
+    ],
+  };
+  try {
+    device_object.findone_devicedata(filter).then((result) => {
+      if (result == null) {
+        try {
+          device_object.createdata_devicedata(data);
+          console.log("created device for the first time");
+        } catch {
+          return res.status(500).json({ message: "server error" });
+        }
+      } else {
+        data = {
           time: currentDateTime,
           soilmoisture: body.soilmoisture,
           temperature: body.temperature,
-        },
-      ],
-    };
-    try {
-      device_object.findone_devicedata(filter).then((result) => {
-        if (result == null) {
-          try {
-            device_object.createdata_devicedata(data);
-            console.log("created device for the first time");
+        };
+        try {
+          const update = {
+            $push: { data: data },
+          };
+          device_object.data_additon(filter, update);
+          console.log("inserted data from already created deviceid");
+        } catch (error) {
+          return res.status(500).json({ message: "server error" });
+        }
+      }
+      try {
+        device_object.find_controls(filter).then((result) => {
+          if (result.mode == "manual") {
+            try {
+              const update = {
+                $set: { mode: "automatic", water: result.water },
+              };
+              device_object.update_controls(filter, update);
+              return res.status(200).json({
+                mode: "manual",
+                water: result.water,
+                message: "data added",
+              });
+            } catch (error) {
+              return res.status(500).json({ message: "server error" });
+            }
+          } else if (result.mode == "automatic") {
+            //not done with the logic yet
+
             return res
               .status(200)
-              .json({ message: "created deviceid and data added" });
-          } catch {
-            return res.status(500).json({ message: "server error" });
+              .json({ message: "data added", mode: "automatic" });
+          } else {
+            const timeinterval = result.timeinterval;
+            const lasttime = result.time;
+            const currentDateTime = new Date();
+            const timedifference = currentDateTime - lasttime;
+            const betweentime = timedifference / (1000 * 60);
+            console.log(betweentime);
+            if (betweentime >= timeinterval) {
+              try {
+                const update = { $set: { time: currentDateTime } };
+                device_object.update_controls(filter, update);
+                return res.status(200).json({
+                  mode: "timeinterval",
+                  water: result.water,
+                  message: "data added",
+                });
+              } catch (error) {
+                return res.status(500).json({ message: "server error" });
+              }
+            } else {
+              return res.status(200).json({
+                message: "data added",
+              });
+            }
           }
-        } else {
-          data = {
-            time: currentDateTime,
-            soilmoisture: body.soilmoisture,
-            temperature: body.temperature,
-          };
-          try {
-            const update = {
-              $push: { data: data },
-            };
-            device_object.data_additon(filter, update);
-            console.log("inserted data from already created deviceid");
-            return res.status(200).json({ message: "data added" });
-          } catch (error) {
-            return res.status(500).json({ message: "server error" });
-          }
-        }
-      });
-    } catch (error) {
-      console.log("error");
-      return res.status(500).json({ message: "server error" });
-    }
-  } else {
-    return res.status(401).json({ message: "Invalid authentication" });
+        });
+      } catch (error) {
+        return res.status(500).json({ message: "server error" });
+      }
+    });
+  } catch (error) {
+    console.log("error");
+    return res.status(500).json({ message: "server error" });
   }
 };
 
-module.exports = { devicedata_post };
+const control_create = (req, res) => {
+  const body = req.body;
+  const filter = { deviceid: body.deviceid };
+  try {
+    device_object.create_controls(filter);
+    return res.status(200).json({ message: "controls created" });
+  } catch (error) {
+    return res.status(500).json({ message: "server error" });
+  }
+};
+
+const control_automatic = (req, res) => {
+  const body = req.body;
+  const filter = { deviceid: body.deviceid };
+  try {
+    device_object.find_controls(filter).then((result) => {
+      if (result == null) {
+        return res.status(404).json({ message: "no deviceid found" });
+      } else {
+        try {
+          const currentDateTime = new Date();
+          var update = {
+            $unset: { timeinterval: 1 },
+            $set: {
+              mode: "automatic",
+              water: body.water,
+              time: currentDateTime,
+            },
+          };
+
+          device_object.update_controls(filter, update);
+          return res.status(200).json({ message: "controls updated" });
+        } catch (error) {
+          console.log(error);
+          return res.status(500).json({ message: "server error" });
+        }
+      }
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "server error" });
+  }
+};
+
+const control_manual = (req, res) => {
+  const body = req.body;
+  const filter = { deviceid: body.deviceid };
+  try {
+    device_object.find_controls(filter).then((result) => {
+      if (result == null) {
+        return res.status(404).json({ message: "no deviceid found" });
+      } else {
+        const update = {
+          $set: { water: body.water, mode: "manual" },
+          $unset: { timeinterval: 1 },
+        };
+        try {
+          device_object.update_controls(filter, update);
+          return res.status(200).json({ message: "control updated" });
+        } catch (error) {
+          return res.status(500).json({ message: "server error" });
+        }
+      }
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "server error" });
+  }
+};
+
+const control_timeinterval = (req, res) => {
+  const body = req.body;
+  const filter = { deviceid: body.deviceid };
+  try {
+    device_object.find_controls(filter).then((result) => {
+      if (result == null) {
+        return res.status(404).json({ message: "no deviceid found" });
+      } else {
+        const currentDateTime = new Date();
+        const update = {
+          $set: {
+            water: body.water,
+            mode: "timeinterval",
+            timeinterval: body.timeinterval,
+            time: currentDateTime,
+          },
+        };
+        try {
+          device_object.update_controls(filter, update);
+          return res.status(200).json({ message: "controls updated" });
+        } catch (error) {
+          return res.status(500).json({ message: "server error" });
+        }
+      }
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "server error" });
+  }
+};
+
+module.exports = {
+  devicedata_post,
+  control_create,
+  control_automatic,
+  control_manual,
+  control_timeinterval,
+};

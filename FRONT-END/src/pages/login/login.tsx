@@ -1,7 +1,5 @@
 import "bootstrap/dist/css/bootstrap.css";
-import Button from "../../components/Button";
 import { useEffect, useState } from "react";
-import Inputtag from "../../components/Inputtag";
 import axios, { AxiosResponse } from "axios";
 import { useCookies } from "react-cookie";
 import { useNavigate, useSearchParams } from "react-router-dom";

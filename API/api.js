@@ -9,7 +9,7 @@ app.use(express.json());
 // Use the router for a specific path prefix (e.g., /api)
 app.use("/api/users", user_router);
 app.use("/api/inventory", inventory_router);
-app.use("/api/devicedata", devicedata_router);
+app.use("/api/device", devicedata_router);
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {

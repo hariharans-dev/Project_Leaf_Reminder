@@ -1,30 +1,37 @@
 const express = require("express");
-const cookieParser = require("cookie-parser");
+const axios = require("axios");
+// require("dotenv").config();
 
 const app = express();
+const port = 3000; // You can use any port you prefer
 
-// Use cookie-parser middleware to handle cookies
-app.use(cookieParser());
+// Replace 'YOUR_API_KEY' with your actual OpenWeatherMap API key
 
-app.get("/set-cookie", (req, res) => {
-  // Set a cookie with the name 'user' and the value 'hari'
-  const user = "user";
-  const name = "hari";
-  res.cookie(user, name);
-  res.send("Cookie saved: user=hari");
-});
+// Middleware to handle CORS (Cross-Origin Resource Sharing) if needed
+// app.use((req, res, next) => {
+//   res.header("Access-Control-Allow-Origin", "*");
+//   res.header(
+//     "Access-Control-Allow-Headers",
+//     "Origin, X-Requested-With, Content-Type, Accept"
+//   );
+//   next();
+// });
 
-app.get("/get-cookie", (req, res) => {
-  // Retrieve and print the value of the 'user' cookie
-  const userCookie = req.cookies.user;
-  console.log(userCookie);
-  if (userCookie) {
-    res.send(`User: ${userCookie}`);
-  } else {
-    res.send("User cookie not found.");
+// Weather API endpoint
+app.post("/weather", async (req, res) => {
+  const { latitude, longitude } = req.query;
+  console.log(process.env.WEATHER_API_KEY);
+  const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${process.env.WEATHER_API_KEY}`;
+
+  try {
+    const response = await axios.get(apiUrl);
+    const weatherData = response.data;
+    res.json(weatherData);
+  } catch (error) {
+    res.status(500).json({ error: "Error fetching weather data" });
   }
 });
 
-app.listen(3000, () => {
-  console.log("Server is running on port 3000");
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
 });
