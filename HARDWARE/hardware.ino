@@ -2,8 +2,12 @@
 #include <ESP8266HTTPClient.h>
 #include <ESP8266WebServer.h>
 #include <EEPROM.h>
+#include <Arduino.h>
 
 //Variables
+
+String deviceid = "123456";
+String key = "xYmzkhMlVNUoxJDqV2oK1XzpnD5QrW9s";
 int i = 0;
 int statusCode;
 const char* ssid = "Default_SSID";
@@ -14,6 +18,9 @@ String content;
 String esid;
 const unsigned long serverRunInterval = 5 * 60 * 1000;
 const unsigned long wifitime = 60;
+const unsigned long data_send_delay = 1 * 60 * 1000;
+float moisture = 30;
+float temperature = 123.45;
 
 
 //Function Decalration
@@ -21,6 +28,7 @@ bool testWifi(void);
 void launchWeb(void);
 void setupAP(void);
 void execution(void);
+void base64_encode(const uint8_t* data, size_t inputLength, char* encodedData);
 
 //Establishing Local server at port 80 whenever required
 ESP8266WebServer server(80);
@@ -85,7 +93,87 @@ void loop() {
 }
 
 void execution() {
-  Serial.println("code executions");
+  WiFiClient wifiClient;
+
+  // Create an HTTP object and pass the WiFiClient object
+  HTTPClient http;
+  http.begin(wifiClient, "https://192.168.1.4:5000/api/devicedata");  // Use ::begin(WiFiClient, url)
+
+  // Set headers
+  http.addHeader("Content-Type", "application/json");
+  // Call byte64 to get the Bearer token and store it in a variable
+
+  String inputString = key + ":" + deviceid;
+  const char* inputData = inputString.c_str();
+  size_t inputLength = strlen(inputData);
+  size_t encodedLength = 4 * ((inputLength + 2) / 3);
+  char encodedString[encodedLength + 1];
+  base64_encode((const uint8_t*)inputData, inputLength, encodedString);
+
+  http.addHeader("Authorization", String("Bearer ") + encodedString);  // Replace with your Bearer token
+
+  // Define your JSON data as a variable
+  String jsonData = "{\"soilmoisture\": " + String(moisture) + ", \"temperature\": " + String(temperature) + "}";
+
+  // Send a POST request with the JSON data variable
+  int httpCode = http.POST(jsonData);
+
+  // Check the HTTP response
+  if (httpCode > 0) {
+    Serial.printf("HTTP Code: %d\n", httpCode);
+    String response = http.getString();
+    Serial.println("Response: " + response);
+  } else {
+    Serial.println("Error on HTTP request");
+  }
+
+  // End the request
+  http.end();
+
+  // Wait for some time before sending the next request
+  delay(data_send_delay);
+}
+
+void base64_encode(const uint8_t* data, size_t inputLength, char* encodedData) {
+  static const char base64_chars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+  int i = 0, j = 0;
+  uint8_t char_array_3[3];
+  uint8_t char_array_4[4];
+
+  while (inputLength--) {
+    char_array_3[i++] = *(data++);
+    if (i == 3) {
+      char_array_4[0] = (char_array_3[0] & 0xfc) >> 2;
+      char_array_4[1] = ((char_array_3[0] & 0x03) << 4) + ((char_array_3[1] & 0xf0) >> 4);
+      char_array_4[2] = ((char_array_3[1] & 0x0f) << 2) + ((char_array_3[2] & 0xc0) >> 6);
+      char_array_4[3] = char_array_3[2] & 0x3f;
+
+      for (i = 0; i < 4; i++) {
+        encodedData[j++] = base64_chars[char_array_4[i]];
+      }
+      i = 0;
+    }
+  }
+
+  if (i) {
+    for (int k = i; k < 3; k++) {
+      char_array_3[k] = '\0';
+    }
+
+    char_array_4[0] = (char_array_3[0] & 0xfc) >> 2;
+    char_array_4[1] = ((char_array_3[0] & 0x03) << 4) + ((char_array_3[1] & 0xf0) >> 4);
+    char_array_4[2] = ((char_array_3[1] & 0x0f) << 2) + ((char_array_3[2] & 0xc0) >> 6);
+
+    for (int k = 0; k < i + 1; k++) {
+      encodedData[j++] = base64_chars[char_array_4[k]];
+    }
+
+    while ((i++ < 3)) {
+      encodedData[j++] = '=';
+    }
+  }
+  encodedData[j] = '\0';
 }
 
 
