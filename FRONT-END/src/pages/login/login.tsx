@@ -7,7 +7,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import loginimage from "../../assets/login.jpg";
 import logo from "../../assets/logo.jpg";
 import "./style/login.css";
-import Forgetpassword from "./forgetpassword";
+import { useLocation } from "../../functions/location";
 
 export default function Login() {
   var [user, setuser] = useState("");
@@ -19,6 +19,9 @@ export default function Login() {
   const navigate = useNavigate();
 
   const [searchParams] = useSearchParams();
+
+  const location = useLocation();
+  console.log(location);
 
   const createcookie = (
     name: string,
